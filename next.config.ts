@@ -29,6 +29,10 @@ const nextConfig: NextConfig = {
         hostname: 'images.unsplash.com',
         protocol: 'https',
       },
+      {
+        hostname: '*.public.blob.vercel-storage.com',
+        protocol: 'https',
+      },
       ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
         const url = new URL(item)
 
