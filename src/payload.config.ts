@@ -61,11 +61,11 @@ if (isProduction && !isProductionBuild && !usePostgres) {
   throw new Error('A PostgreSQL DATABASE_URL must be configured in production.')
 }
 
-if (process.env.VERCEL && !usePostgres) {
+if (process.env.VERCEL && !isProductionBuild && !usePostgres) {
   throw new Error('DATABASE_URL must point to PostgreSQL on Vercel. SQLite cannot persist data or run Payload migrations there.')
 }
 
-if (process.env.VERCEL && !vercelBlobToken) {
+if (process.env.VERCEL && !isProductionBuild && !vercelBlobToken) {
   throw new Error('BLOB_READ_WRITE_TOKEN must be configured on Vercel so Payload media uploads are stored durably.')
 }
 

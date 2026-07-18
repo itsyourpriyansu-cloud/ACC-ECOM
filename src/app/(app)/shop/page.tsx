@@ -8,7 +8,7 @@ export const metadata = {
   title: 'Curtains for every room',
 }
 
-export const revalidate = 300
+export const dynamic = 'force-dynamic'
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const payload = await getPayload({ config: configPromise })

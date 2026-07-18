@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   },
 }
 
-// Keep the storefront HTML at Vercel's edge while refreshing catalogue changes promptly.
-export const revalidate = 300
+// Payload needs a live database, so never query it while Vercel prerenders the build.
+export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })

@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "npm run migrate && npm run lint && cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build && node -e \"require('node:fs').accessSync('.next/BUILD_ID')\"",
+    "build": "npm run migrate:deploy && npm run lint && cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build && node -e \"require('node:fs').accessSync('.next/BUILD_ID')\"",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "dev:network": "cross-env NODE_OPTIONS=--no-deprecation next dev -H 0.0.0.0",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
@@ -13,6 +13,7 @@
     "import:listings": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/import-listings.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint . --max-warnings 0",
     "migrate": "cross-env NODE_OPTIONS=--no-deprecation payload migrate",
+    "migrate:deploy": "node scripts/migrate-deploy.mjs",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "seed:demo": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed-demo.ts",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
