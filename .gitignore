@@ -10,6 +10,10 @@
 .playwright
 playwright-report/
 playwright-report/index.html
+test-results/
+audit-*.json
+lint-report*.json
+outdated.json
 
 # next.js
 /.next/
@@ -40,4 +44,3 @@ yarn-error.log*
 next-env.d.ts
 
 public/media
-
