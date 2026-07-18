@@ -610,7 +610,6 @@ export const homePageData: (args: ProductArgs) => RequiredDataFromCollectionSlug
     ],
     meta: {
       description: 'An open-source ecommerce site built with Payload and Next.js.',
-      // @ts-expect-error The seed fixture uses the media document returned by the setup helper.
       image: metaImage,
       title: 'Payload Ecommerce Template',
     },

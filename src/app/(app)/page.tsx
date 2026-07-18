@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   },
 }
 
+// Keep the storefront HTML at Vercel's edge while refreshing catalogue changes promptly.
+export const revalidate = 300
+
 export default async function HomePage() {
   const payload = await getPayload({ config: configPromise })
   const products = await payload.find({
@@ -26,4 +29,3 @@ export default async function HomePage() {
 
   return <AlemahHome products={products.docs} />
 }
-

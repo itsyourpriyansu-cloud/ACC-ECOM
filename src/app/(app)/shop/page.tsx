@@ -8,6 +8,8 @@ export const metadata = {
   title: 'Curtains for every room',
 }
 
+export const revalidate = 300
+
 export default async function ShopPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const payload = await getPayload({ config: configPromise })
   const products = await payload.find({
