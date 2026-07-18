@@ -10,9 +10,8 @@ type Props = {
 export const StockIndicator: React.FC<Props> = ({ product }) => {
   const searchParams = useSearchParams()
 
-  const variants = product.variants?.docs || []
-
   const selectedVariant = useMemo<Variant | undefined>(() => {
+    const variants = product.variants?.docs ?? []
     if (product.enableVariants && variants.length) {
       const variantId = searchParams.get('variant')
       const validVariant = variants.find((variant) => {
@@ -28,7 +27,7 @@ export const StockIndicator: React.FC<Props> = ({ product }) => {
     }
 
     return undefined
-  }, [product.enableVariants, searchParams, variants])
+  }, [product.enableVariants, product.variants?.docs, searchParams])
 
   const stockQuantity = useMemo(() => {
     if (product.enableVariants) {

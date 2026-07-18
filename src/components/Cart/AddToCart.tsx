@@ -21,9 +21,8 @@ export function AddToCart({ buyNow = false, product }: Props) {
   const setCartOpen = useUIStore((state) => state.setCartOpen)
   const router = useRouter()
 
-  const variants = product.variants?.docs || []
-
   const selectedVariant = useMemo<Variant | undefined>(() => {
+    const variants = product.variants?.docs ?? []
     if (product.enableVariants && variants.length) {
       const variantId = searchParams.get('variant')
 
@@ -40,7 +39,7 @@ export function AddToCart({ buyNow = false, product }: Props) {
     }
 
     return undefined
-  }, [product.enableVariants, searchParams, variants])
+  }, [product.enableVariants, product.variants?.docs, searchParams])
 
   const addToCart = useCallback(
     (e: React.FormEvent<HTMLButtonElement>) => {

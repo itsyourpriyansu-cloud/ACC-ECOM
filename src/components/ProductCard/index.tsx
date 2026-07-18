@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Suspense } from 'react'
 import type { Product } from '@/payload-types'
 import { AddToCart } from '@/components/Cart/AddToCart'
@@ -15,7 +16,13 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return <article className="alemah-product-card">
     <Link href={`/products/${product.slug}`} className="alemah-product-card__image">
-      <img src={image} alt={product.catalogue?.visual?.alt || product.title} loading="lazy" />
+      <Image
+        alt={product.catalogue?.visual?.alt || product.title}
+        height={600}
+        sizes="(max-width: 768px) 100vw, 33vw"
+        src={image}
+        width={900}
+      />
       {isBestSeller ? <span>Best seller</span> : null}
     </Link>
     <div className="alemah-product-card__body">

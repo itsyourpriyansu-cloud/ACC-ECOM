@@ -2,6 +2,7 @@
 
 import type { Product } from '@/payload-types'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import { ArrowUpRight, Search, SlidersHorizontal, Sparkles, X } from 'lucide-react'
 
@@ -112,7 +113,7 @@ export function CurtainCatalogue({ initialSearch = '', initialFilters = {}, prod
               const attributes = product.catalogue?.attributes
               return (
                 <Link className="catalogue-card" href={`/products/${product.slug}`} key={product.id}>
-                  <div className="catalogue-card-image"><img src={imageFor(product, index)} alt={product.catalogue?.visual?.alt || product.title} /><span>{attributes?.opacity || 'Everyday comfort'}</span><i><ArrowUpRight size={18} /></i></div>
+                  <div className="catalogue-card-image"><Image alt={product.catalogue?.visual?.alt || product.title} height={720} sizes="(max-width: 768px) 100vw, 33vw" src={imageFor(product, index)} width={1200} /><span>{attributes?.opacity || 'Everyday comfort'}</span><i><ArrowUpRight size={18} /></i></div>
                   <div className="catalogue-card-info"><p>{attributes?.curtainType || 'Curtain'} <b>·</b> {attributes?.color || 'Curated colour'}</p><h2>{product.title}</h2><div><strong>{formatINR(product.priceInINR)}</strong><span>{attributes?.size || 'Ready to hang'}</span></div></div>
                 </Link>
               )

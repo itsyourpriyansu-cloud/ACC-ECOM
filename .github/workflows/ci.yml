@@ -1,0 +1,36 @@
+name: Release gates
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  release-gates:
+    name: Build, quality, and test gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: true
+      NODE_ENV: test
+      PAYLOAD_SECRET: ci-only-payload-secret-not-for-production
+      NEXT_PUBLIC_SERVER_URL: http://localhost:3000
+      NEXT_PUBLIC_PHONEPE_ENABLED: false
+      NEXT_PUBLIC_GOOGLE_AUTH_ENABLED: false
+      ALLOW_DEMO_SEED: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run lint
+      - run: npm run build
+      - run: npm run test:unit
+      - run: npm run test:integration
+      - run: npm run test:e2e

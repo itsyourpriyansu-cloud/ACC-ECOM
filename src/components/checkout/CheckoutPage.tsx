@@ -14,13 +14,15 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useAddresses, useCart, usePayments } from '@payloadcms/plugin-ecommerce/client/react'
 import { CheckoutAddresses } from '@/components/checkout/CheckoutAddresses'
 import { CreateAddressModal } from '@/components/addresses/CreateAddressModal'
-import { Address } from '@/payload-types'
+import type { Address, Product, VariantOption } from '@/payload-types'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AddressItem } from '@/components/addresses/AddressItem'
 import { FormItem } from '@/components/forms/FormItem'
 import { toast } from 'sonner'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { CheckoutProgress } from '@/components/checkout/CheckoutProgress'
+
+type ProductGalleryItem = NonNullable<Product['gallery']>[number]
 
 export const CheckoutPage: React.FC = () => {
   const { user } = useAuth()
@@ -56,7 +58,7 @@ export const CheckoutPage: React.FC = () => {
         }
       }
     }
-  }, [addresses])
+  }, [addresses, shippingAddress])
 
   useEffect(() => {
     return () => {
@@ -318,7 +320,7 @@ export const CheckoutPage: React.FC = () => {
             if (typeof item.product === 'object' && item.product) {
               const {
                 product,
-                product: { id, meta, title, gallery },
+                product: { meta, title, gallery },
                 quantity,
                 variant,
               } = item
@@ -333,14 +335,14 @@ export const CheckoutPage: React.FC = () => {
               if (isVariant) {
                 price = variant?.priceInINR
 
-                const imageVariant = product.gallery?.find((item: any) => {
+                const imageVariant = product.gallery?.find((item: ProductGalleryItem) => {
                   if (!item.variantOption) return false
                   const variantOptionID =
                     typeof item.variantOption === 'object'
                       ? item.variantOption.id
                       : item.variantOption
 
-                  const hasMatch = variant?.options?.some((option: any) => {
+                  const hasMatch = variant?.options?.some((option: number | VariantOption) => {
                     if (typeof option === 'object') return option.id === variantOptionID
                     else return option === variantOptionID
                   })
@@ -368,7 +370,7 @@ export const CheckoutPage: React.FC = () => {
                       {variant && typeof variant === 'object' && (
                         <p className="text-sm font-mono text-primary/50 tracking-widest">
                           {variant.options
-                            ?.map((option: any) => {
+                            ?.map((option: number | VariantOption) => {
                               if (typeof option === 'object') return option.label
                               return null
                             })

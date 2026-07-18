@@ -5,17 +5,21 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
+    "build": "npm run lint && cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build && node -e \"require('node:fs').accessSync('.next/BUILD_ID')\"",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "dev:network": "cross-env NODE_OPTIONS=--no-deprecation next dev -H 0.0.0.0",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "import:listings": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/import-listings.ts",
-    "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
+    "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint . --max-warnings 0",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "seed:demo": "cross-env NODE_OPTIONS=--no-deprecation tsx src/scripts/seed-demo.ts",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test": "vitest run"
+    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "cross-env NODE_ENV=test vitest run tests/int",
+    "test:e2e": "cross-env NODE_ENV=test playwright test",
+    "release:check": "npm run build && npm test"
   },
   "dependencies": {
     "@google/genai": "^2.11.0",

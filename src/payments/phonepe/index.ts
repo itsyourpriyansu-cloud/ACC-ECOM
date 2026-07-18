@@ -4,6 +4,8 @@ import type {
   PaymentAdapterClient,
   PaymentAdapterClientArgs,
 } from '@payloadcms/plugin-ecommerce/types'
+import type { DefaultDocumentIDType } from 'payload'
+import type { Cart, Order, Transaction } from '@/payload-types'
 
 type PhonePeAdapterArgs = {
   clientID?: string
@@ -14,6 +16,21 @@ type PhonePeAdapterArgs = {
 } & PaymentAdapterArgs
 
 type PhonePeResponse = Record<string, unknown>
+
+type PhonePeCartItem = {
+  product?: DefaultDocumentIDType | { id: DefaultDocumentIDType } | null
+  quantity: number
+  variant?: DefaultDocumentIDType | { id: DefaultDocumentIDType }
+}
+
+type PhonePePayload = {
+  create: {
+    (args: { collection: 'orders'; data: object; req: unknown }): Promise<Order>
+    (args: { collection: 'transactions'; data: object; req: unknown }): Promise<Transaction>
+  }
+  find: (args: { collection: 'transactions'; depth: number; req: unknown; where: object }) => Promise<{ docs: Transaction[] }>
+  update: (args: { collection: 'carts' | 'transactions'; data: object; id: DefaultDocumentIDType; req: unknown }) => Promise<Cart | Transaction>
+}
 
 const getValue = (value: unknown, keys: string[]): string | undefined => {
   if (!value || typeof value !== 'object') return undefined
@@ -60,12 +77,16 @@ const getAccessToken = async (props: PhonePeAdapterArgs) => {
   return accessToken
 }
 
-const flattenCartItems = (items: any[] = []) =>
-  items.map((item) => ({
-    ...(item.variant ? { variant: typeof item.variant === 'object' ? item.variant.id : item.variant } : {}),
-    product: typeof item.product === 'object' ? item.product.id : item.product,
-    quantity: item.quantity,
-  }))
+const flattenCartItems = (items: PhonePeCartItem[] = []) =>
+  items.flatMap((item) => {
+    if (!item.product) return []
+
+    return [{
+      ...(item.variant ? { variant: typeof item.variant === 'object' ? item.variant.id : item.variant } : {}),
+      product: typeof item.product === 'object' ? item.product.id : item.product,
+      quantity: item.quantity,
+    }]
+  })
 
 const getCheckoutURL = (response: PhonePeResponse) =>
   getValue(response, ['redirectUrl', 'paymentUrl']) ||
@@ -85,7 +106,7 @@ export const phonePeAdapter = (props: PhonePeAdapterArgs): PaymentAdapter => {
 
   return {
     confirmOrder: async ({ cartsSlug = 'carts', data, ordersSlug = 'orders', req, transactionsSlug = 'transactions' }) => {
-      const payload: any = req.payload
+      const payload = req.payload as unknown as PhonePePayload
       const merchantOrderID = data.merchantOrderID
 
       if (!merchantOrderID || typeof merchantOrderID !== 'string') {
@@ -93,16 +114,17 @@ export const phonePeAdapter = (props: PhonePeAdapterArgs): PaymentAdapter => {
       }
 
       const transactions = await payload.find({
-        collection: transactionsSlug,
+        collection: transactionsSlug as 'transactions',
         depth: 0,
         req,
         where: { 'phonepe.merchantOrderID': { equals: merchantOrderID } },
       })
-      const transaction = transactions.docs[0] as any
+      const transaction = transactions.docs[0]
 
       if (!transaction) throw new Error('PhonePe payment transaction was not found.')
       if (transaction.order) {
-        return { message: 'Order was already confirmed.', orderID: transaction.order, transactionID: transaction.id }
+        const orderID = typeof transaction.order === 'object' ? transaction.order.id : transaction.order
+        return { message: 'Order was already confirmed.', orderID, transactionID: transaction.id }
       }
 
       const accessToken = await getAccessToken(props)
@@ -118,7 +140,7 @@ export const phonePeAdapter = (props: PhonePeAdapterArgs): PaymentAdapter => {
       }
 
       const order = await payload.create({
-        collection: ordersSlug,
+        collection: ordersSlug as 'orders',
         data: {
           amount: transaction.amount,
           currency: transaction.currency,
@@ -131,14 +153,17 @@ export const phonePeAdapter = (props: PhonePeAdapterArgs): PaymentAdapter => {
         req,
       })
 
+      const cartID = typeof transaction.cart === 'object' ? transaction.cart?.id : transaction.cart
+      if (!cartID) throw new Error('PhonePe payment transaction does not reference a cart.')
+
       await payload.update({
-        collection: cartsSlug,
+        collection: cartsSlug as 'carts',
         data: { purchasedAt: new Date().toISOString(), status: 'purchased' },
-        id: transaction.cart,
+        id: cartID,
         req,
       })
       await payload.update({
-        collection: transactionsSlug,
+        collection: transactionsSlug as 'transactions',
         data: {
           order: order.id,
           phonepe: { phonePeTransactionID: getPhonePeTransactionID(statusPayload) },
@@ -166,7 +191,7 @@ export const phonePeAdapter = (props: PhonePeAdapterArgs): PaymentAdapter => {
       type: 'group',
     },
     initiatePayment: async ({ data, req, transactionsSlug = 'transactions' }) => {
-      const payload: any = req.payload
+      const payload = req.payload as unknown as PhonePePayload
       const cart = data.cart
       const customerEmail = data.customerEmail
       const amount = cart?.subtotal
@@ -184,16 +209,16 @@ export const phonePeAdapter = (props: PhonePeAdapterArgs): PaymentAdapter => {
 
       const merchantOrderID = `AHM-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`
       const transaction = await payload.create({
-        collection: transactionsSlug,
+        collection: transactionsSlug as 'transactions',
         data: {
           ...(req.user ? { customer: req.user.id } : { customerEmail }),
           amount,
           billingAddress: data.billingAddress,
           cart: cart.id,
-          currency: data.currency,
+          currency: 'INR',
           items: flattenCartItems(cart.items),
           paymentMethod: 'phonepe',
-          phonepe: { merchantOrderID, shippingAddress: data.shippingAddress },
+          phonepe: { merchantOrderID, shippingAddress: data.shippingAddress as unknown as Record<string, unknown> },
           status: 'pending',
         },
         req,
@@ -228,7 +253,7 @@ export const phonePeAdapter = (props: PhonePeAdapterArgs): PaymentAdapter => {
         return { checkoutURL, merchantOrderID, message: 'PhonePe payment initiated.' }
       } catch (error) {
         await payload.update({
-          collection: transactionsSlug,
+          collection: transactionsSlug as 'transactions',
           data: { status: 'failed' },
           id: transaction.id,
           req,

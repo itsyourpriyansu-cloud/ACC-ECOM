@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { LoaderCircle, Mic, RotateCcw, Send, ShoppingBag, Sparkles, X } from 'lucide-react'
 import { useCart } from '@payloadcms/plugin-ecommerce/client/react'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -43,7 +44,7 @@ function AdvisorProductCard({ item }: { item: AdvisorRecommendation }) {
     <article className="advisor-product-card">
       <div className="advisor-product-image">
         {item.imageUrl ? (
-          <img alt={item.title} src={item.imageUrl} />
+          <Image alt={item.title} height={600} sizes="(max-width: 768px) 100vw, 320px" src={item.imageUrl} width={600} />
         ) : (
           <span>Image coming soon</span>
         )}

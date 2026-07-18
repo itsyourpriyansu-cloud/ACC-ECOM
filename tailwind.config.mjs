@@ -1,7 +1,7 @@
 import plugin from 'tailwindcss/plugin'
 import tailwindTypography from '@tailwindcss/typography'
 /** @type {import('tailwindcss').Config} */
-export default {
+const config = {
   content: [
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -194,3 +194,5 @@ export default {
     }),
   ],
 }
+
+export default config

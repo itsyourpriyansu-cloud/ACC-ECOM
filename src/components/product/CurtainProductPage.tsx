@@ -1,5 +1,6 @@
 import type { Product } from '@/payload-types'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Check, ChevronLeft, Ruler, ShieldCheck, SunMedium, Truck } from 'lucide-react'
 
 import { ProductDescription } from './ProductDescription'
@@ -25,7 +26,7 @@ export function CurtainProductPage({ product }: { product: Product }) {
     <div className="curtain-product-shell">
       <div className="curtain-product-breadcrumb"><Link href="/shop"><ChevronLeft size={16} /> All curtains</Link><span> / </span><span>{attributes?.curtainType || 'Curtains'}</span></div>
       <div className="curtain-product-main">
-        <div className="curtain-product-image"><img src={visual?.stockImageUrl || fallbackImage} alt={visual?.alt || product.title} /><span>{attributes?.opacity || 'Thoughtfully made'}</span></div>
+        <div className="curtain-product-image"><Image alt={visual?.alt || product.title} height={1200} priority sizes="(max-width: 768px) 100vw, 50vw" src={visual?.stockImageUrl || fallbackImage} width={1600} /><span>{attributes?.opacity || 'Thoughtfully made'}</span></div>
         <div className="curtain-product-buy">
           <p className="curtain-product-kicker">{attributes?.curtainType || 'Alemah curtains'} <b>·</b> {attributes?.color || 'Curated colour'}</p>
           <ProductDescription product={product} />

@@ -1,11 +1,9 @@
-// @ts-nocheck
-
 /**
  * Simple object check.
  * @param item
  * @returns {boolean}
  */
-export function isObject(item: unknown): boolean {
+export function isObject(item: unknown): item is Record<string, unknown> {
   return item && typeof item === 'object' && !Array.isArray(item)
 }
 
@@ -14,8 +12,11 @@ export function isObject(item: unknown): boolean {
  * @param target
  * @param ...sources
  */
-export function deepMerge<T, R>(target: T, source: R): T {
-  const output = { ...target }
+export function deepMerge<T extends Record<string, unknown>, R extends Record<string, unknown>>(
+  target: T,
+  source: R,
+): T & R {
+  const output: Record<string, unknown> = { ...target }
   if (isObject(target) && isObject(source)) {
     Object.keys(source).forEach((key) => {
       if (isObject(source[key])) {
@@ -30,5 +31,5 @@ export function deepMerge<T, R>(target: T, source: R): T {
     })
   }
 
-  return output
+  return output as T & R
 }

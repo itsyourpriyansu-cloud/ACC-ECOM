@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, Payload } from 'payload'
 import { createShiprocketOrder, isShiprocketConfigured } from '@/shipping/shiprocket'
 
 /**
@@ -81,7 +81,7 @@ export const Orders: CollectionConfig = {
       async ({ doc, operation, req }) => {
         if (operation !== 'update' || !doc.sendToShiprocket || doc.shiprocketShipmentId) return doc
 
-        const payload: any = req.payload
+        const payload: Payload = req.payload
         const order = await payload.findByID({
           collection: 'orders',
           depth: 1,

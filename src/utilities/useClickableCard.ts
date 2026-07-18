@@ -96,11 +96,11 @@ export function useClickableCard<T extends HTMLElement>({
 
   return {
     card: {
-      // @ts-expect-error
+      // @ts-expect-error React's ref union cannot express this shared callback ref.
       ref: card,
     },
     link: {
-      // @ts-expect-error
+      // @ts-expect-error React's ref union cannot express this shared callback ref.
       ref: link,
     },
   }
