@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "build": "npm run lint && cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build && node -e \"require('node:fs').accessSync('.next/BUILD_ID')\"",
+    "build": "npm run migrate && npm run lint && cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build && node -e \"require('node:fs').accessSync('.next/BUILD_ID')\"",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "dev:network": "cross-env NODE_OPTIONS=--no-deprecation next dev -H 0.0.0.0",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
