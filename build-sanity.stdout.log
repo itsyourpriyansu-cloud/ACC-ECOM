@@ -1,0 +1,318 @@
+
+> alemah-payload@1.0.0 build
+> cross-env NODE_OPTIONS="--no-deprecation --max-old-space-size=8000" next build
+
+   ▲ Next.js 15.5.20
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 48s
+   Linting and checking validity of types ...
+
+./src/app/(app)/(account)/account/addresses/page.tsx
+39:5  Warning: 'orders' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+40:12  Warning: 'error' is defined but never used. Allowed unused caught errors must match /^(_|ignore)/u.  @typescript-eslint/no-unused-vars
+
+./src/app/(app)/(account)/account/page.tsx
+62:12  Warning: 'error' is defined but never used. Allowed unused caught errors must match /^(_|ignore)/u.  @typescript-eslint/no-unused-vars
+118:34  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/app/(app)/(account)/orders/page.tsx
+39:12  Warning: 'error' is defined but never used. Allowed unused caught errors must match /^(_|ignore)/u.  @typescript-eslint/no-unused-vars
+53:34  Warning: 'index' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/app/(app)/checkout/confirm-order/page.tsx
+4:17  Warning: 'Fragment' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+16:9  Warning: 'paymentIntent' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/app/(app)/products/[slug]/page.tsx
+5:10  Warning: 'Gallery' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'ProductDescription' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+13:17  Warning: 'Suspense' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+14:10  Warning: 'Button' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+15:10  Warning: 'ChevronLeftIcon' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+69:9  Warning: 'gallery' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/app/(app)/robots.ts
+1:1  Warning: Unused eslint-disable directive (no problems were reported from 'no-restricted-exports').
+
+./src/blocks/Carousel/Component.tsx
+14:11  Warning: 'id' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/blocks/Code/Component.client.tsx
+16:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+18:30  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+18:38  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+22:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+22:45  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/blocks/Form/Checkbox/index.tsx
+10:10  Warning: 'Error' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+19:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+22:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+24:15  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/blocks/Form/Component.tsx
+146:43  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/blocks/Form/Country/index.tsx
+21:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+24:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/blocks/Form/Email/index.tsx
+17:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/blocks/Form/Number/index.tsx
+8:10  Warning: 'Error' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+17:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/blocks/Form/Select/index.tsx
+20:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+23:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/blocks/Form/State/index.tsx
+21:35  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+24:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/blocks/Form/Text/index.tsx
+17:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/blocks/Form/Textarea/index.tsx
+17:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/collections/Orders/index.ts
+84:24  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/collections/Pages/hooks/revalidatePage.ts
+3:26  Warning: 'revalidateTag' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/collections/Products/index.ts
+212:75  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/ai-home-advisor/AdvisorPageShell.tsx
+28:61  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/ai-home-advisor/GuidedAdvisor.tsx
+81:661  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/Cart/AddToCart.tsx
+24:9  Warning: The 'variants' logical expression could make the dependencies of useMemo Hook (at line 43) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'variants' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+
+./src/components/Cart/CartModal.tsx
+88:71  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+95:72  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+135:50  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/Cart/OpenCart.tsx
+2:8  Warning: 'clsx' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+3:10  Warning: 'ShoppingCart' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+7:3  Warning: 'className' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/catalogue/CurtainCatalogue.tsx
+115:57  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/CategoryTabs/Item.tsx
+15:9  Warning: 'q' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/checkout/CheckoutPage.tsx
+59:6  Warning: React Hook useEffect has a missing dependency: 'shippingAddress'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+321:28  Warning: 'id' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+336:67  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+343:68  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+371:44  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/forms/AccountForm/index.tsx
+5:10  Warning: 'Message' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/Header/MobileMenu.tsx
+32:9  Warning: 'closeMobileMenu' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/layout/search/Categories.tsx
+6:10  Warning: 'FilterList' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/Media/Image/index.tsx
+30:10  Warning: 'isLoading' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u.  @typescript-eslint/no-unused-vars
+50:11  Warning: 'filename' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/Media/index.tsx
+12:31  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+22:41  Warning: Image elements must have an alt prop, either with meaningful text, or an empty string for decorative images.  jsx-a11y/alt-text
+
+./src/components/product/CurtainProductPage.tsx
+28:48  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/product/Gallery.tsx
+3:24  Warning: 'MediaType' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/product/StockIndicator.tsx
+13:9  Warning: The 'variants' logical expression could make the dependencies of useMemo Hook (at line 31) change on every render. Move it inside the useMemo callback. Alternatively, wrap the initialization of 'variants' in its own useMemo() Hook.  react-hooks/exhaustive-deps
+
+./src/components/ProductCard/index.tsx
+18:7  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/ProductGridItem/index.tsx
+1:24  Warning: 'Variant' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/components/ProductItem/index.tsx
+2:10  Warning: 'OrderStatus' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+4:10  Warning: 'Button' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+5:19  Warning: 'MediaType' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+5:30  Warning: 'Order' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+6:10  Warning: 'formatDateTime' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+22:3  Warning: 'style' is assigned a value but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/endpoints/seed/home.ts
+1:15  Warning: 'Category' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+613:7  Warning: Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free.  @typescript-eslint/ban-ts-comment
+
+./src/endpoints/seed/index.ts
+149:5  Warning: 'accessoriesCategory' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u.  @typescript-eslint/no-unused-vars
+271:5  Warning: 'hoodieID' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+277:5  Warning: 'largeTshirtHoodieVariant' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u.  @typescript-eslint/no-unused-vars
+278:5  Warning: 'xlargeTshirtHoodieVariant' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u.  @typescript-eslint/no-unused-vars
+316:13  Warning: 'contactPage' is assigned a value but never used. Allowed unused elements of array destructuring must match /^_/u.  @typescript-eslint/no-unused-vars
+336:9  Warning: 'customerUSAddress' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+345:9  Warning: 'customerUKAddress' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+389:9  Warning: 'openCart' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+407:9  Warning: 'abandonedCart' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+447:5  Warning: 'completedCartID' is assigned a value but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/endpoints/seed/product-hat.ts
+1:34  Warning: 'VariantOption' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+17:3  Warning: 'variantTypes' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/migrations/20260711_171557_initial_schema.ts
+3:32  Warning: 'payload' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+3:41  Warning: 'req' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+1493:34  Warning: 'payload' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+1493:43  Warning: 'req' is defined but never used. Allowed unused args must match /^_/u.  @typescript-eslint/no-unused-vars
+
+./src/payments/phonepe/index.ts
+63:34  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+88:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+101:51  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+169:22  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/providers/Auth/index.tsx
+7:1  Warning: Unused eslint-disable directive (no problems were reported from 'no-unused-vars').
+14:66  Warning: Unused eslint-disable directive (no problems were reported from 'no-unused-vars').
+16:101  Warning: Unused eslint-disable directive (no problems were reported from 'no-unused-vars').
+18:75  Warning: Unused eslint-disable directive (no problems were reported from 'no-unused-vars').
+28:40  Warning: Unused eslint-disable directive (no problems were reported from 'no-unused-vars').
+64:14  Warning: 'e' is defined but never used. Allowed unused caught errors must match /^(_|ignore)/u.  @typescript-eslint/no-unused-vars
+92:14  Warning: 'e' is defined but never used. Allowed unused caught errors must match /^(_|ignore)/u.  @typescript-eslint/no-unused-vars
+113:14  Warning: 'e' is defined but never used. Allowed unused caught errors must match /^(_|ignore)/u.  @typescript-eslint/no-unused-vars
+136:16  Warning: 'e' is defined but never used. Allowed unused caught errors must match /^(_|ignore)/u.  @typescript-eslint/no-unused-vars
+165:14  Warning: 'e' is defined but never used. Allowed unused caught errors must match /^(_|ignore)/u.  @typescript-eslint/no-unused-vars
+193:14  Warning: 'e' is defined but never used. Allowed unused caught errors must match /^(_|ignore)/u.  @typescript-eslint/no-unused-vars
+216:14  Warning: 'T' is defined but never used. Allowed unused vars must match /^_/u.  @typescript-eslint/no-unused-vars
+216:44  Warning: Unused eslint-disable directive (no problems were reported from 'no-unused-vars').
+
+./src/providers/Theme/types.ts
+4:43  Warning: Unused eslint-disable directive (no problems were reported from 'no-unused-vars').
+
+./src/utilities/deepMerge.ts
+1:1  Warning: Do not use "@ts-nocheck" because it alters compilation errors.  @typescript-eslint/ban-ts-comment
+
+./src/utilities/useClickableCard.ts
+99:7  Warning: Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer.  @typescript-eslint/ban-ts-comment
+103:7  Warning: Include a description after the "@ts-expect-error" directive to explain why the @ts-expect-error is necessary. The description must be 3 characters or longer.  @typescript-eslint/ban-ts-comment
+
+./src/utilities/useIgnoredEffect.ts
+12:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+13:16  Warning: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+20:6  Warning: React Hook useEffect was passed a dependency list that is not an array literal. This means we can't statically verify whether you've passed the correct dependencies.  react-hooks/exhaustive-deps
+20:6  Warning: React Hook useEffect has a missing dependency: 'ignoredDeps'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+22:3  Warning: React Hook useEffect received a function whose dependencies are unknown. Pass an inline function instead.  react-hooks/exhaustive-deps
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+E-mail configured with ethereal.email test account. 
+Log into mock email provider at https://ethereal.email
+Mock email account username: img3z2ilcmxb2vqh@ethereal.email
+Mock email account password: h5tYGkSZs2hcfRrBSg
+E-mail configured with ethereal.email test account. 
+Log into mock email provider at https://ethereal.email
+Mock email account username: los3qv6wgzmgod62@ethereal.email
+Mock email account password: 9ZrfPKDz7rFWUysfc1
+E-mail configured with ethereal.email test account. 
+E-mail configured with ethereal.email test account. 
+Log into mock email provider at https://ethereal.email
+Mock email account username: hfntayd7rvlz2lw3@ethereal.email
+Mock email account password: QdZJZT1vvSufjZDYjX
+Log into mock email provider at https://ethereal.email
+Mock email account username: qh42tim4y4eysqfn@ethereal.email
+Mock email account password: VMN919pMNRyKChwjKP
+E-mail configured with ethereal.email test account. 
+Log into mock email provider at https://ethereal.email
+Mock email account username: pv3lhqn3nrhgvt6v@ethereal.email
+Mock email account password: XXqGJZ19ePPHS5Tbch
+E-mail configured with ethereal.email test account. 
+Log into mock email provider at https://ethereal.email
+Mock email account username: dbv6lmhknino557h@ethereal.email
+Mock email account password: nfeaeRhmA2jGhP88vt
+E-mail configured with ethereal.email test account. 
+Log into mock email provider at https://ethereal.email
+Mock email account username: znkrs7ydnz6dd5qh@ethereal.email
+Mock email account password: yBsGDEqBxcKN3MUM4b
+   Generating static pages (0/27) ...
+   Generating static pages (6/27) 
+   Generating static pages (13/27) 
+E-mail configured with ethereal.email test account. 
+Log into mock email provider at https://ethereal.email
+Mock email account username: ziwywund7bay6w6b@ethereal.email
+Mock email account password: t5dTzER7RrFBhHPR3a
+   Generating static pages (20/27) 
+E-mail configured with ethereal.email test account. 
+Log into mock email provider at https://ethereal.email
+Mock email account username: fbvg7dtbuuiqhlub@ethereal.email
+Mock email account password: G5VpaUMN4dfuuNPgxU
+ ✓ Generating static pages (27/27)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                    Size  First Load JS  Revalidate  Expire
+┌ ○ /                                       12.7 kB         150 kB
+├ ○ /_not-found                                1 kB         105 kB
+├ ● /[slug]                                   905 B         219 kB
+├ ƒ /account                                 3.6 kB         148 kB
+├ ƒ /account/addresses                      2.07 kB         166 kB
+├ ƒ /admin/[[...segments]]                  1.09 kB         741 kB
+├ ○ /ai-home-advisor                        6.86 kB         130 kB
+├ ƒ /api/[...slug]                            176 B         104 kB
+├ ○ /api/ai-home-advisor/catalogue-options    166 B         104 kB          1m      1y
+├ ƒ /api/ai-home-advisor/chat                 166 B         104 kB
+├ ƒ /api/ai-home-advisor/recommend            166 B         104 kB
+├ ƒ /api/graphql                              166 B         104 kB
+├ ƒ /api/graphql-playground                   176 B         104 kB
+├ ƒ /auth/email/continue                      166 B         104 kB
+├ ƒ /auth/google                              166 B         104 kB
+├ ƒ /auth/google/callback                     166 B         104 kB
+├ ○ /checkout                               9.15 kB         191 kB
+├ ƒ /checkout/confirm-order                  1.9 kB         121 kB
+├ ○ /checkout/phonepe/return                3.12 kB         126 kB
+├ ƒ /create-account                          4.5 kB         133 kB
+├ ○ /faq                                      175 B         107 kB
+├ ƒ /find-order                             3.04 kB         128 kB
+├ ○ /forgot-password                        2.28 kB         130 kB
+├ ƒ /login                                  3.97 kB         132 kB
+├ ƒ /logout                                 1.21 kB         108 kB
+├ ƒ /next/exit-preview                        166 B         104 kB
+├ ƒ /next/preview                             166 B         104 kB
+├ ƒ /next/seed                                166 B         104 kB
+├ ƒ /orders                                   614 B         115 kB
+├ ƒ /orders/[id]                            2.27 kB         169 kB
+├ ○ /privacy                                  175 B         107 kB
+├ ƒ /products/[slug]                        7.17 kB         234 kB
+├ ƒ /shop                                   3.35 kB         110 kB
+└ ○ /terms                                    175 B         107 kB
++ First Load JS shared by all                104 kB
+  ├ chunks/1255-ab54a41c275880be.js           46 kB
+  ├ chunks/4bd1b696-100b9d70ed4e49c1.js     54.2 kB
+  └ other shared chunks (total)              3.4 kB
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

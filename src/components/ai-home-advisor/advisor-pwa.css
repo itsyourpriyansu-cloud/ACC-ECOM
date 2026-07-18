@@ -1,0 +1,27 @@
+@media (max-width:780px){
+  .advisor-shell{width:100%;max-width:100%;min-height:calc(100dvh - 4rem);overflow:hidden;padding-bottom:calc(4rem + env(safe-area-inset-bottom,0px));overscroll-behavior:none}
+  .advisor-chat-panel{min-width:0;min-height:calc(100dvh - 4rem)}
+  .advisor-chat-panel header{position:sticky;top:0;z-index:4;min-height:52px;align-items:center;padding:.7rem 1rem;background:#fffdfa}
+  .advisor-timeline{min-width:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:1.5rem}
+  .advisor-message{overflow-wrap:anywhere}
+  .advisor-product-card,.advisor-product-copy,.advisor-product-meta{min-width:0}
+  .advisor-product-copy h3{overflow-wrap:anywhere}
+  .advisor-composer-wrap{z-index:5;bottom:calc(4rem + env(safe-area-inset-bottom,0px));padding: .75rem 1rem calc(.75rem + env(safe-area-inset-bottom,0px));box-shadow:0 -8px 18px rgba(81,33,37,.05)}
+  .advisor-choices{margin-inline:-1rem;padding-inline:1rem;scroll-padding-inline:1rem;scroll-snap-type:x proximity}
+  .advisor-choices button{min-height:44px;padding-inline:.85rem;scroll-snap-align:start}
+  .advisor-composer{min-height:48px;border-radius:0}
+  .advisor-composer button{min-height:48px}
+  .advisor-summary{box-sizing:border-box;padding:calc(1.5rem + env(safe-area-inset-top,0px)) 1.25rem calc(1.5rem + env(safe-area-inset-bottom,0px));overscroll-behavior:contain}
+  .advisor-summary-close{top:calc(.65rem + env(safe-area-inset-top,0px));right:.65rem}
+  .advisor-summary h1{max-width:12ch;font-size:2.45rem}
+  .advisor-comparison-grid{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+}
+@media (max-width:380px){
+  .advisor-product-card{grid-template-columns:92px minmax(0,1fr)}
+  .advisor-product-image{min-height:136px}
+  .advisor-product-copy{padding:.72rem}
+  .advisor-product-copy ul{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .advisor-shell *, .advisor-shell *::before, .advisor-shell *::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
+}

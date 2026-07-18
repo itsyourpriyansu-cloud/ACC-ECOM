@@ -1,0 +1,34 @@
+import { createLocalReq, getPayload } from 'payload'
+import { seed } from '@/endpoints/seed'
+import config from '@payload-config'
+import { NextRequest } from 'next/server'
+
+import { checkRole } from '@/access/utilities'
+
+export const maxDuration = 300 // This function can run for a maximum of 300 seconds
+
+export async function POST(request: NextRequest): Promise<Response> {
+  if (process.env.NODE_ENV === 'production') {
+    return new Response('Not found.', { status: 404 })
+  }
+
+  const payload = await getPayload({ config })
+  const { user } = await payload.auth({ headers: request.headers })
+
+  if (!user || !checkRole(['admin'], user)) {
+    return new Response('Action forbidden.', { status: 403 })
+  }
+
+  try {
+    // Create a Payload request object to pass to the Local API for transactions
+    // At this point you should pass in a user, locale, and any other context you need for the Local API
+    const payloadReq = await createLocalReq({ user }, payload)
+
+    await seed({ payload, req: payloadReq })
+
+    return Response.json({ success: true })
+  } catch (e) {
+    payload.logger.error({ err: e, message: 'Error seeding data' })
+    return new Response('Error seeding data.', { status: 500 })
+  }
+}

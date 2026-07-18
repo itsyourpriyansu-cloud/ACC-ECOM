@@ -1,0 +1,40 @@
+{
+  "name": "Alemah — Curtains for every kind of home",
+  "short_name": "Alemah",
+  "description": "Thoughtful curtains for Indian homes.",
+  "id": "/",
+  "lang": "en-IN",
+  "display": "standalone",
+  "background_color": "#fffdfa",
+  "theme_color": "#512125",
+  "start_url": "/",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/alemah-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/alemah-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/alemah-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Curtain Finder",
+      "short_name": "Finder",
+      "description": "Find curtains that fit your home.",
+      "url": "/ai-home-advisor"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+npm warn Unknown project config "enable-pre-post-scripts". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+ ⨯ Error: SMTP configuration missing in production: SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS.
+    at <unknown> (C:\Users\priyansu\Downloads\AMH-ECC\alemah-payload\.next\server\chunks\4871.js:1:29593)
+ ⨯ Error: SMTP configuration missing in production: SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS.
+    at <unknown> (C:\Users\priyansu\Downloads\AMH-ECC\alemah-payload\.next\server\chunks\4871.js:1:29593)
+ ⨯ Error: SMTP configuration missing in production: SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS.
+    at <unknown> (C:\Users\priyansu\Downloads\AMH-ECC\alemah-payload\.next\server\chunks\4871.js:1:29593)
+ ⨯ Error: SMTP configuration missing in production: SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS.
+    at <unknown> (C:\Users\priyansu\Downloads\AMH-ECC\alemah-payload\.next\server\chunks\4871.js:1:29593)
+ ⨯ Error: SMTP configuration missing in production: SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS.
+    at <unknown> (C:\Users\priyansu\Downloads\AMH-ECC\alemah-payload\.next\server\chunks\4871.js:1:29593)
+ ⨯ Error: SMTP configuration missing in production: SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS.
+    at <unknown> (C:\Users\priyansu\Downloads\AMH-ECC\alemah-payload\.next\server\chunks\4871.js:1:29593)
+ ⨯ Error: SMTP configuration missing in production: SMTP_HOST, SMTP_USER, SMTP_PASS, SMTP_FROM_ADDRESS.
+    at <unknown> (C:\Users\priyansu\Downloads\AMH-ECC\alemah-payload\.next\server\chunks\4871.js:1:29593)

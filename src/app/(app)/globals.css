@@ -1,0 +1,490 @@
+@import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@300,400,500,700,800,900&f[]=satoshi@300,400,500,700,900&display=swap');
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@config '../../../tailwind.config.mjs';
+
+@custom-variant dark (&:is([data-theme='dark'] *));
+@custom-variant sm (@media (width >= theme(--breakpoint-sm)));
+@custom-variant md (@media (width >= theme(--breakpoint-md)));
+@custom-variant lg (@media (width >= theme(--breakpoint-lg)));
+@custom-variant xl (@media (width >= theme(--breakpoint-xl)));
+@custom-variant 2xl (@media (width >= theme(--breakpoint-2xl)));
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: unset;
+    font-size: unset;
+  }
+}
+
+@plugin "@tailwindcss/typography";
+
+@source inline("lg:col-span-4");
+@source inline("lg:col-span-6");
+@source inline("lg:col-span-8");
+@source inline("lg:col-span-12");
+@source inline("border-border");
+@source inline("bg-card");
+@source inline("border-error");
+@source inline("bg-error/30");
+@source inline("border-success");
+@source inline("bg-success/30");
+@source inline("border-warning");
+@source inline("bg-warning/30");
+
+@theme {
+  --breakpoint-sm: 40rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --breakpoint-2xl: 86rem;
+
+  /* Alemah brand fonts */
+  --font-serif: "Cabinet Grotesk", sans-serif;
+  --font-sans: "Satoshi", sans-serif;
+
+  /* Alemah brand palette */
+  --color-alemah-red-600: #9D3233;
+  --color-alemah-red-700: #D75A4D;
+  --color-alemah-red-800: #512125;
+  --color-alemah-red-100: #F67C79;
+  --color-alemah-red-050: #FFF5F5;
+  --color-alemah-ivory: #ffffff;
+  --color-alemah-cream: #F6EBBD;
+  --color-alemah-sand: #EBDCA0;
+  --color-alemah-espresso: #512125;
+  --color-alemah-taupe: #7A4D50;
+  --color-alemah-gold: #D75A4D;
+
+  /* Feedback colors */
+  --color-ios-green: #2E6B3E;
+  --color-ios-red: #9D3233;
+  --color-ios-blue: #2A597F;
+  --color-ios-yellow: #E5A93C;
+}
+
+/* Global typography: h tags → Cabinet Grotesk, body/p → Satoshi */
+html {
+  scroll-behavior: auto;
+  background-color: #fffdfa;
+  color: #512125;
+  font-family: "Satoshi", sans-serif;
+}
+
+body {
+  min-width: 320px;
+  background: #fffdfa;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Cabinet Grotesk", sans-serif;
+}
+
+p, span, li, label, input, textarea, button, a {
+  font-family: "Satoshi", sans-serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #ffffff; }
+::-webkit-scrollbar-thumb { background: #EBDCA0; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #7A4D50; }
+
+/* Watermark backdrop pattern */
+.textile-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23EBDCA0' fill-opacity='0.08' fill-rule='evenodd'%3E%3Ccircle cx='5' cy='5' r='1'/%3E%3Ccircle cx='25' cy='5' r='1'/%3E%3Ccircle cx='15' cy='15' r='1'/%3E%3Ccircle cx='35' cy='15' r='1'/%3E%3Ccircle cx='5' cy='25' r='1'/%3E%3Ccircle cx='25' cy='25' r='1'/%3E%3Ccircle cx='15' cy='35' r='1'/%3E%3Ccircle cx='35' cy='35' r='1'/%3E%3Cpath d='M0 40L40 0H39L0 39v1zm1-1L40 1V0H39L0 39v1z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Solid navigational surfaces remain readable over every image and on low-end phones. */
+.frosted-glass {
+  background: #fffdfa;
+  border-bottom: 1px solid rgba(81, 33, 37, 0.14);
+}
+
+.alemah-announcement { background: #512125; color: #fffdfa; font-size: 11px; font-weight: 700; letter-spacing: .08em; padding: 8px 16px; text-align: center; text-transform: uppercase; }
+
+/* Redesigned Floating Sticky Header */
+.alemah-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(255, 253, 250, 0.94);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(81,33,37,.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (min-width: 768px) {
+  .alemah-header {
+    top: 16px;
+    margin-inline: auto;
+    width: calc(100% - 40px);
+    max-width: 1280px;
+    border-radius: 12px;
+    border: 1px solid rgba(81, 33, 37, 0.08);
+    box-shadow: 0 8px 30px rgba(81, 33, 37, 0.04);
+  }
+}
+
+.alemah-header__inner {
+  align-items: center;
+  display: flex;
+  height: 64px;
+  justify-content: space-between;
+  margin: auto;
+  width: 100%;
+  padding-inline: clamp(16px, 3vw, 36px);
+}
+
+.alemah-wordmark {
+  color: #9D3233;
+  font-family: "Cabinet Grotesk", sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  line-height: 1;
+}
+
+/* Nav links hover micro-animations */
+.alemah-desktop-nav {
+  align-items: center;
+  display: flex;
+  gap: 26px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.alemah-desktop-nav > a, .alemah-nav-menu > button {
+  position: relative;
+  align-items: center;
+  background: none;
+  border: 0;
+  color: #512125;
+  display: flex;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 4px;
+  padding: 18px 0;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.25s ease;
+}
+
+.alemah-desktop-nav > a::after, .alemah-nav-menu > button::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background-color: #9D3233;
+  transition: width 0.25s ease, left 0.25s ease;
+}
+
+.alemah-desktop-nav > a:hover::after, .alemah-nav-menu > button:hover::after,
+.alemah-desktop-nav > a.is-active::after {
+  width: 100%;
+  left: 0;
+}
+
+.alemah-desktop-nav > a:hover, .alemah-desktop-nav > a.is-active, .alemah-nav-menu > button:hover {
+  color: #9D3233;
+}
+
+.alemah-nav-menu {
+  position: relative;
+}
+
+/* Dropdown entrance transitions */
+.alemah-mega-menu, .alemah-dropdown {
+  background: rgba(255, 253, 250, 0.98);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(81, 33, 37, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(81, 33, 37, 0.08);
+  display: grid;
+  left: 50%;
+  padding: 24px;
+  position: absolute;
+  top: 100%;
+  transform: translateX(-50%);
+  width: max-content;
+  z-index: 50;
+  animation: navDropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes navDropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.alemah-mega-menu {
+  gap: 32px;
+  grid-template-columns: repeat(3, 180px);
+}
+
+.alemah-mega-menu p, .alemah-dropdown p {
+  color: #9D3233;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.alemah-mega-menu a, .alemah-dropdown a {
+  color: #765B5B;
+  display: block;
+  font-size: 13px;
+  padding: 6px 0;
+  transition: color 0.2s;
+}
+
+.alemah-mega-menu a:hover, .alemah-dropdown a:hover {
+  color: #9D3233;
+  padding-left: 2px;
+}
+
+.alemah-dropdown {
+  min-width: 205px;
+}
+
+.alemah-colour-menu {
+  grid-template-columns: 1fr 1fr;
+  width: 256px;
+}
+
+.alemah-colour-menu p {
+  grid-column: 1 / -1;
+}
+
+.alemah-colour-menu a {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+
+.alemah-colour-menu i {
+  border: 1px solid rgba(81, 33, 37, 0.15);
+  border-radius: 999px;
+  height: 12px;
+  width: 12px;
+}
+
+.alemah-header-actions {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+}
+
+.alemah-header-actions a, .alemah-header-actions button, .alemah-icon-button {
+  align-items: center;
+  background: none;
+  border: 0;
+  color: #512125;
+  display: flex;
+  font-size: 12px;
+  font-weight: 700;
+  gap: 5px;
+  padding: 8px 2px;
+  position: relative;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.alemah-header-actions svg, .alemah-icon-button svg {
+  height: 18px;
+  width: 18px;
+}
+
+.alemah-header-actions a:hover, .alemah-header-actions button:hover {
+  color: #9D3233;
+}
+
+.alemah-header-actions b {
+  background: #9D3233;
+  border-radius: 999px;
+  color: white;
+  font-size: 9px;
+  height: 15px;
+  line-height: 15px;
+  position: absolute;
+  right: -7px;
+  text-align: center;
+  top: 0;
+  width: 15px;
+}
+
+.alemah-drawer-layer {
+  background: rgba(31, 17, 18, 0.45);
+  backdrop-filter: blur(4px);
+  inset: 0;
+  position: fixed;
+  z-index: 60;
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* Redesigned Native drawer sheet */
+.alemah-mobile-drawer {
+  background: #fffdfa;
+  box-shadow: 20px 0 50px rgba(81, 33, 37, 0.12);
+  height: 100%;
+  max-width: 360px;
+  overflow-y: auto;
+  padding: 24px;
+  width: min(85vw, 360px);
+  border-top-right-radius: 16px;
+  border-bottom-right-radius: 16px;
+  animation: drawerSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes drawerSlideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.alemah-drawer-top {
+  align-items: center;
+  color: #9D3233;
+  display: flex;
+  font-size: 11px;
+  font-weight: 900;
+  justify-content: space-between;
+  letter-spacing: .12em;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(81, 33, 37, 0.08);
+  text-transform: uppercase;
+}
+
+.alemah-drawer-top button {
+  background: none;
+  border: 0;
+  color: #512125;
+  padding: 6px;
+}
+
+.alemah-mobile-drawer nav > a, .alemah-mobile-drawer summary {
+  align-items: center;
+  border-bottom: 1px solid rgba(81,33,37,.08);
+  color: #512125;
+  display: flex;
+  font-size: 15px;
+  font-weight: 700;
+  justify-content: space-between;
+  min-height: 48px;
+  padding: 10px 0;
+}
+
+.alemah-mobile-drawer summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.alemah-mobile-drawer summary::-webkit-details-marker {
+  display: none;
+}
+
+.alemah-mobile-drawer summary svg, .alemah-mobile-drawer nav > a svg {
+  height: 16px;
+  width: 16px;
+}
+
+.alemah-mobile-drawer details > div {
+  background: #f7f1e8;
+  display: grid;
+  gap: 2px;
+  margin: 0 -12px;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.alemah-mobile-drawer details a {
+  color: #765B5B;
+  font-size: 13px;
+  padding: 6px 0;
+}
+
+.alemah-mobile-drawer section + section {
+  border-top: 1px solid rgba(81,33,37,.08);
+  margin-top: 6px;
+  padding-top: 6px;
+}
+
+.alemah-mobile-drawer section p {
+  color: #9D3233;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 1100px) {
+  .alemah-desktop-nav { gap: 16px; }
+  .alemah-track-link { display: none !important; }
+}
+
+@media (max-width: 767px) {
+  .alemah-announcement { font-size: 10px; padding: 7px 12px; }
+  .alemah-header__inner { height: 56px; padding: 0 16px; }
+  .alemah-wordmark { font-size: 20px; margin-right: auto; margin-left: 8px; }
+  .alemah-header-actions { gap: 12px; }
+  .alemah-header-actions a:nth-child(2) { display: none; }
+}
+
+.pb-safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.pt-safe-top { padding-top: env(safe-area-inset-top, 0px); }
+
+/* iOS-style tap feedback */
+.ios-active-scale {
+  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.ios-active-scale:active {
+  transform: scale(0.96);
+}
+
+/* GSAP reveal base state */
+.gsap-reveal {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Keyframe animations */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-100%); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pulseSlow {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+@keyframes loadingProgress {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+
+.animate-slide-up    { animation: slideUp   0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-slide-left  { animation: slideLeft 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-slide-right { animation: slideRight 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-fade-in     { animation: fadeIn    0.15s ease-out both; }
+.animate-pulse-slow  { animation: pulseSlow 2.5s ease-in-out infinite; }
+.animate-loading-bar { animation: loadingProgress 1.4s infinite linear; }

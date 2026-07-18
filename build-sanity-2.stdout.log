@@ -1,0 +1,8 @@
+
+> alemah-payload@1.0.0 build
+> cross-env NODE_OPTIONS="--no-deprecation --max-old-space-size=8000" next build
+
+   ▲ Next.js 15.5.20
+   - Environments: .env.local, .env
+
+   Creating an optimized production build ...
