@@ -1,6 +1,4 @@
 import { CurtainCatalogue } from '@/components/catalogue/CurtainCatalogue'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 
 export const metadata = {
   description:
@@ -15,11 +13,16 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
   const hasPostgres = [process.env.DATABASE_URL, process.env.DATABASE_URI].some((url) =>
     url?.startsWith('postgres'),
   )
+  const payloadUnavailable = process.env.VERCEL && (!hasPostgres || !process.env.PAYLOAD_SECRET)
 
-  if (process.env.NEXT_PHASE === 'phase-production-build' && !hasPostgres) {
+  if (payloadUnavailable || (process.env.NEXT_PHASE === 'phase-production-build' && !hasPostgres)) {
     return <CurtainCatalogue initialSearch={params.search || ''} initialFilters={params} products={[]} />
   }
 
+  const [{ default: configPromise }, { getPayload }] = await Promise.all([
+    import('@payload-config'),
+    import('payload'),
+  ])
   const payload = await getPayload({ config: configPromise })
   const products = await payload.find({
     collection: 'products',
