@@ -11,6 +11,15 @@ export const metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function ShopPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
+  const params = await searchParams
+  const hasPostgres = [process.env.DATABASE_URL, process.env.DATABASE_URI].some((url) =>
+    url?.startsWith('postgres'),
+  )
+
+  if (process.env.NEXT_PHASE === 'phase-production-build' && !hasPostgres) {
+    return <CurtainCatalogue initialSearch={params.search || ''} initialFilters={params} products={[]} />
+  }
+
   const payload = await getPayload({ config: configPromise })
   const products = await payload.find({
     collection: 'products',
@@ -26,8 +35,6 @@ export default async function ShopPage({ searchParams }: { searchParams: Promise
       ],
     },
   })
-
-  const params = await searchParams
 
   return <CurtainCatalogue initialSearch={params.search || ''} initialFilters={params} products={products.docs} />
 }

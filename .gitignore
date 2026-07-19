@@ -11,6 +11,7 @@
 playwright-report/
 playwright-report/index.html
 test-results/
+test.db*
 audit-*.json
 lint-report*.json
 outdated.json

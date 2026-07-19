@@ -17,6 +17,15 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
+  // A missing deployment database must never make Next's build-time page
+  // collection query the ephemeral SQLite fallback.
+  if (
+    process.env.NEXT_PHASE === 'phase-production-build' &&
+    ![process.env.DATABASE_URL, process.env.DATABASE_URI].some((url) => url?.startsWith('postgres'))
+  ) {
+    return <AlemahHome products={[]} />
+  }
+
   const payload = await getPayload({ config: configPromise })
   const products = await payload.find({
     collection: 'products',

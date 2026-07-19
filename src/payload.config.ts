@@ -37,8 +37,13 @@ const isProduction = process.env.NODE_ENV === 'production'
 // pretending to have production delivery credentials.
 const isProductionBuild = process.env.NEXT_PHASE === 'phase-production-build'
 const allowDemoSeed = process.env.ALLOW_DEMO_SEED === 'true'
-const databaseURL = process.env.DATABASE_URL
-const usePostgres = databaseURL?.startsWith('postgres')
+// DATABASE_URI was Payload's template default for older deployments. Accept it
+// as a compatibility alias so an existing Vercel database never falls through
+// to the ephemeral SQLite development adapter.
+const databaseURL = [process.env.DATABASE_URL, process.env.DATABASE_URI].find((url) =>
+  url?.startsWith('postgres'),
+)
+const usePostgres = Boolean(databaseURL)
 const vercelBlobToken = process.env.BLOB_READ_WRITE_TOKEN
 const payloadSecret = process.env.PAYLOAD_SECRET || (allowDemoSeed ? 'demo-seed-only-secret' : '')
 const missingSMTPConfig = ['SMTP_HOST', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM_ADDRESS'].filter(
@@ -58,11 +63,13 @@ if (isProduction && !isProductionBuild && !payloadSecret) {
 }
 
 if (isProduction && !isProductionBuild && !usePostgres) {
-  throw new Error('A PostgreSQL DATABASE_URL must be configured in production.')
+  throw new Error('A PostgreSQL DATABASE_URL (or legacy DATABASE_URI) must be configured in production.')
 }
 
 if (process.env.VERCEL && !isProductionBuild && !usePostgres) {
-  throw new Error('DATABASE_URL must point to PostgreSQL on Vercel. SQLite cannot persist data or run Payload migrations there.')
+  throw new Error(
+    'DATABASE_URL (or legacy DATABASE_URI) must point to PostgreSQL on Vercel. SQLite cannot persist data there.',
+  )
 }
 
 if (process.env.VERCEL && !isProductionBuild && !vercelBlobToken) {
@@ -80,7 +87,7 @@ if (isProduction && !isProductionBuild && googleAuthEnabled && (!process.env.GOO
 const db = usePostgres
   ? postgresAdapter({
       pool: {
-        connectionString: databaseURL,
+        connectionString: databaseURL!,
         max: Number(process.env.DATABASE_POOL_MAX || 20),
       },
       // Shared and production-like databases must change only through committed migrations.
