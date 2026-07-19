@@ -72,10 +72,6 @@ if (process.env.VERCEL && !isProductionBuild && !usePostgres) {
   )
 }
 
-if (process.env.VERCEL && !isProductionBuild && !vercelBlobToken) {
-  throw new Error('BLOB_READ_WRITE_TOKEN must be configured on Vercel so Payload media uploads are stored durably.')
-}
-
 if (isProduction && !isProductionBuild && phonePeEnabled && missingPhonePeConfig.length > 0) {
   throw new Error(`PhonePe configuration missing in production: ${missingPhonePeConfig.join(', ')}.`)
 }
