@@ -84,6 +84,11 @@ const db = usePostgres
   ? postgresAdapter({
       pool: {
         connectionString: databaseURL!,
+        // A Vercel function must fail promptly when its database network path is
+        // unavailable. Without this, node-postgres can wait until the function
+        // itself reaches Vercel's multi-minute runtime limit.
+        connectionTimeoutMillis: Number(process.env.DATABASE_CONNECTION_TIMEOUT_MS || 10_000),
+        idleTimeoutMillis: 30_000,
         max: Number(process.env.DATABASE_POOL_MAX || 20),
       },
       // Shared and production-like databases must change only through committed migrations.
