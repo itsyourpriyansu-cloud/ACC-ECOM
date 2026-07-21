@@ -332,7 +332,7 @@ To run Payload in production, you need to build and start the Admin panel. To do
 This application uses Payload for users and authentication, with PostgreSQL as
 its database. It does **not** use the Supabase JavaScript Auth client. Supabase
 is supported as the managed PostgreSQL host: configure Payload's
-`DATABASE_URL` with Supabase's Transaction Pooler connection string.
+`DATABASE_URL` with Supabase's **Session Pooler** connection string.
 
 Before the first production deployment, copy the variable names from
 [`.env.production.example`](.env.production.example) into **Vercel → Project
@@ -341,10 +341,12 @@ minimum, set `PAYLOAD_SECRET`, `DATABASE_URL`,
 `PAYLOAD_PUBLIC_SERVER_URL=https://acc-ecom.vercel.app`, and
 `NEXT_PUBLIC_SERVER_URL=https://acc-ecom.vercel.app`. Use the exact Supabase
 pooler URI from **Supabase → Connect**; Vercel functions should use the
-transaction pooler and `DATABASE_POOL_MAX=1`.
+Session Pooler (port `5432`) and `DATABASE_POOL_MAX=1`.
 
-The build runs committed Payload migrations before Next.js builds, so the
-database must be reachable by Vercel. Do not add `.env` or `.env.local` to Git:
+Apply committed Payload migrations deliberately with `npm run migrate` from a
+trusted environment before deploying. Set `SKIP_BUILD_MIGRATIONS=true` on
+Vercel so build workers do not contend with the production database pool. Do
+not add `.env` or `.env.local` to Git:
 they can contain database and OAuth credentials. Once the variables are saved,
 redeploy the Production deployment. The public API endpoints (including
 `/api/products`, `/api/users/login`, and `/api/users/me`) will then use the
