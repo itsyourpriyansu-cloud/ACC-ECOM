@@ -2,6 +2,14 @@ import 'dotenv/config'
 
 import { spawnSync } from 'node:child_process'
 
+// Build machines should compile the application, not contend for migration locks
+// against the production pool. Migrations are applied explicitly (for example,
+// from a trusted workstation or CI job) before enabling a deployment.
+if (process.env.SKIP_BUILD_MIGRATIONS === 'true') {
+  console.log('SKIP_BUILD_MIGRATIONS=true; skipping build-time database migrations.')
+  process.exit(0)
+}
+
 // Payload projects historically used DATABASE_URI. Prefer the current name,
 // but keep existing deployments working while they are migrated to DATABASE_URL.
 const databaseURL = [process.env.DATABASE_URL, process.env.DATABASE_URI].find((url) =>
