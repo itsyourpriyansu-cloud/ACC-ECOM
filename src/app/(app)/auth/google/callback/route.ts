@@ -2,7 +2,8 @@ import crypto from 'crypto'
 
 import configPromise from '@payload-config'
 import { NextRequest, NextResponse } from 'next/server'
-import { generatePayloadCookie, getFieldsToSign, getPayload, jwtSign } from 'payload'
+import { createLocalReq, generatePayloadCookie, getFieldsToSign, getPayload, jwtSign } from 'payload'
+import { addSessionToUser } from 'payload/shared'
 
 const STATE_COOKIE = 'alemah-google-oauth-state'
 
@@ -116,8 +117,27 @@ export async function GET(request: NextRequest) {
     const collection = payload.config.collections.find(({ slug }) => slug === 'users')
     if (!collection?.auth) throw new Error('Customer authentication is not configured.')
 
+    // Payload is configured with session-backed authentication. A JWT without
+    // the persisted session id is deliberately treated as a guest session by
+    // Payload, so Google sign-in must create the same session a password login
+    // would create before issuing its cookie.
+    const localRequest = await createLocalReq(
+      {
+        req: {
+          headers: request.headers,
+          url: request.url,
+        },
+      },
+      payload,
+    )
+    const { sid } = await addSessionToUser({
+      collectionConfig: collection,
+      payload,
+      req: localRequest,
+      user,
+    })
     const { token } = await jwtSign({
-      fieldsToSign: getFieldsToSign({ collectionConfig: collection, email, user }),
+      fieldsToSign: getFieldsToSign({ collectionConfig: collection, email, sid, user }),
       secret: payload.secret,
       tokenExpiration: collection.auth.tokenExpiration,
     })
