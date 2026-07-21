@@ -341,7 +341,7 @@ minimum, set `PAYLOAD_SECRET`, `DATABASE_URL`,
 `PAYLOAD_PUBLIC_SERVER_URL=https://acc-ecom.vercel.app`, and
 `NEXT_PUBLIC_SERVER_URL=https://acc-ecom.vercel.app`. Use the exact Supabase
 pooler URI from **Supabase → Connect**; Vercel functions should use the
-Session Pooler (port `5432`) and `DATABASE_POOL_MAX=1`.
+Session Pooler (port `5432`) and `DATABASE_POOL_MAX=2`.
 
 Apply committed Payload migrations deliberately with `npm run migrate` from a
 trusted environment before deploying. Set `SKIP_BUILD_MIGRATIONS=true` on

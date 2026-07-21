@@ -89,7 +89,9 @@ const db = usePostgres
         // itself reaches Vercel's multi-minute runtime limit.
         connectionTimeoutMillis: Number(process.env.DATABASE_CONNECTION_TIMEOUT_MS || 10_000),
         idleTimeoutMillis: 30_000,
-        max: Number(process.env.DATABASE_POOL_MAX || 20),
+        // Payload holds one connection for adapter initialization, so one
+        // additional connection is required for application queries.
+        max: Math.max(2, Number(process.env.DATABASE_POOL_MAX || 2)),
       },
       // Shared and production-like databases must change only through committed migrations.
       push: false,
