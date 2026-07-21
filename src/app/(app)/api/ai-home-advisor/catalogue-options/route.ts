@@ -3,7 +3,10 @@ import { NextResponse } from 'next/server'
 import { discoverAdvisorCategories } from '@/lib/ai-home-advisor/catalog/discover-categories'
 import { getAdvisorCatalogue } from '@/lib/ai-home-advisor/catalog/get-catalogue'
 
-export const revalidate = 60
+// This endpoint reads the live Payload/Supabase catalogue. Do not prerender it
+// during `next build`, where a pooled database connection can delay or block a
+// production deployment. The response keeps its short CDN cache below.
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
