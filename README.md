@@ -341,7 +341,7 @@ minimum, set `PAYLOAD_SECRET`, `DATABASE_URL`,
 `PAYLOAD_PUBLIC_SERVER_URL=https://acc-ecom.vercel.app`, and
 `NEXT_PUBLIC_SERVER_URL=https://acc-ecom.vercel.app`. Use the exact Supabase
 pooler URI from **Supabase → Connect**; Vercel functions should use the
-Transaction Pooler (port `6543`) and `DATABASE_POOL_MAX=2`. A session-pooler
+Transaction Pooler (port `6543`) and `DATABASE_POOL_MAX=3`. A session-pooler
 connection can be exhausted when several Vercel instances start together. Keep
 `sslmode=require&uselibpqcompat=true` from the example so the pooler connection
 is encrypted without rejecting Supabase's managed certificate chain.

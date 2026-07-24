@@ -92,9 +92,10 @@ const db = usePostgres
         connectionTimeoutMillis: Number(process.env.DATABASE_CONNECTION_TIMEOUT_MS || 10_000),
         idleTimeoutMillis: 10_000,
         keepAlive: true,
-        // Payload holds one connection for adapter initialization, so one
-        // additional connection is required for application queries.
-        max: Math.max(2, Number(process.env.DATABASE_POOL_MAX || 2)),
+        // Payload holds one connection for adapter initialization. Mutations
+        // can also hold a transaction while cleaning document locks, so a
+        // third connection is required to avoid a pool deadlock.
+        max: Math.max(3, Number(process.env.DATABASE_POOL_MAX || 3)),
       },
       // Shared and production-like databases must change only through committed migrations.
       push: false,
