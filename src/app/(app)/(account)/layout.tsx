@@ -1,15 +1,15 @@
 import type { ReactNode } from 'react'
 
-import { headers as getHeaders } from 'next/headers.js'
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import { RenderParams } from '@/components/RenderParams'
 import { AccountNav } from '@/components/AccountNav'
+import { getCurrentUser } from '@/lib/auth/current-user'
+import { redirect } from 'next/navigation'
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const headers = await getHeaders()
-  const payload = await getPayload({ config: configPromise })
-  const { user } = await payload.auth({ headers })
+  const current = await getCurrentUser()
+  if (!current) {
+    redirect(`/login?returnTo=${encodeURIComponent('/account')}`)
+  }
 
   return (
     <div>
@@ -18,7 +18,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </div>
 
       <div className="container mt-8 flex gap-8 pb-28 md:mt-16 md:pb-8">
-        {user && <AccountNav className="max-w-62 grow flex-col items-start gap-4 hidden md:flex" />}
+        <AccountNav className="max-w-62 grow flex-col items-start gap-4 hidden md:flex" />
 
         <div className="flex flex-col gap-12 grow">{children}</div>
       </div>

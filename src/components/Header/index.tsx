@@ -72,7 +72,17 @@ export default function Header() {
         </nav>
         <div className="alemah-header-actions">
           <Link aria-label="Search curtains" href="/shop"><Search /></Link>
-          <Link aria-label="My account" href={user ? '/account' : '/login'}><User /><span className="hidden xl:inline">Account</span></Link>
+          {user ? (
+            <>
+              <Link aria-label="My account" href="/account"><User /><span className="hidden xl:inline">{user.displayName || user.firstName || 'Account'}</span></Link>
+              <Link className="hidden xl:inline" href="/logout">Logout</Link>
+            </>
+          ) : (
+            <>
+              <Link aria-label="Login" href="/login"><User /><span className="hidden xl:inline">Login</span></Link>
+              <Link className="hidden xl:inline" href="/signup">Create account</Link>
+            </>
+          )}
           <Link className="alemah-track-link" href="/find-order">Track Order</Link>
           <button aria-label={`Cart${totalItems ? `, ${totalItems} items` : ''}`} onClick={() => setCartOpen(true)} type="button"><ShoppingBag />{totalItems > 0 ? <b aria-live="polite">{totalItems}</b> : null}</button>
         </div>

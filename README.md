@@ -127,6 +127,10 @@ For more details on how to extend this functionality, see the [Payload Access Co
 
 Registered users can log in to view their order history, manage saved addresses, and track ongoing orders directly from their account dashboard.
 
+The production customer authentication architecture, Google Cloud setup,
+session model, migrations, and deployment checklist are documented in
+[`docs/authentication.md`](docs/authentication.md).
+
 ## Guests
 
 Guest checkout allows users to complete purchases without creating an account. When a guest places an order:

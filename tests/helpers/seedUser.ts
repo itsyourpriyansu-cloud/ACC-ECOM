@@ -1,5 +1,6 @@
 import { getPayload } from 'payload'
 import config from '../../src/payload.config.js'
+import { trustedAuthContext } from '../../src/collections/Users/hooks/security.js'
 
 export const testUser = {
   email: 'dev@payloadcms.com',
@@ -15,6 +16,7 @@ export async function seedTestUser(): Promise<void> {
   // Delete existing test user if any
   await payload.delete({
     collection: 'users',
+    overrideAccess: true,
     where: {
       email: {
         equals: testUser.email,
@@ -25,7 +27,17 @@ export async function seedTestUser(): Promise<void> {
   // Create fresh test user
   await payload.create({
     collection: 'users',
-    data: testUser,
+    context: trustedAuthContext,
+    data: {
+      ...testUser,
+      _verified: true,
+      accountStatus: 'active',
+      authMethods: ['password'],
+      hasLocalPassword: true,
+      roles: ['admin'],
+    },
+    disableVerificationEmail: true,
+    overrideAccess: true,
   })
 }
 
@@ -37,6 +49,7 @@ export async function cleanupTestUser(): Promise<void> {
 
   await payload.delete({
     collection: 'users',
+    overrideAccess: true,
     where: {
       email: {
         equals: testUser.email,

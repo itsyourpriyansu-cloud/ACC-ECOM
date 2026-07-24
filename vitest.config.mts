@@ -8,7 +8,9 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    hookTimeout: 60_000,
     setupFiles: ['./vitest.setup.ts'],
     include: ['tests/{unit,int}/**/*.spec.ts'],
+    testTimeout: 30_000,
   },
 })

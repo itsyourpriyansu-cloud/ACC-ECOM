@@ -1,192 +1,101 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+
 import { FormError } from '@/components/forms/FormError'
 import { FormItem } from '@/components/forms/FormItem'
-import { Message } from '@/components/Message'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User } from '@/payload-types'
+import type { SafeUser } from '@/lib/auth/types'
 import { useAuth } from '@/providers/Auth'
-import { useRouter } from 'next/navigation'
-import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 
-type FormData = {
-  email: string
-  name: User['name']
-  password: string
-  passwordConfirm: string
+type FormData = Pick<SafeUser, 'firstName'> & {
+  avatarURL: string
+  displayName: string
+  lastName: string
 }
 
-export const AccountForm: React.FC = () => {
+export const AccountForm = () => {
   const { setUser, user } = useAuth()
-  const [changePassword, setChangePassword] = useState(false)
-
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
   const {
-    formState: { errors, isLoading, isSubmitting, isDirty },
+    formState: { errors, isDirty, isSubmitting },
     handleSubmit,
     register,
     reset,
-    watch,
   } = useForm<FormData>()
 
-  const password = useRef({})
-  password.current = watch('password', '')
-
-  const router = useRouter()
-
-  const onSubmit = useCallback(
-    async (data: FormData) => {
-      if (user) {
-        const response = await fetch(`/api/users/${user.id}`, {
-          // Make sure to include cookies with fetch
-          body: JSON.stringify(data),
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          method: 'PATCH',
-        })
-
-        if (response.ok) {
-          const json = await response.json()
-          setUser(json.doc)
-          toast.success('Successfully updated account.')
-          setChangePassword(false)
-          reset({
-            name: json.doc.name,
-            email: json.doc.email,
-            password: '',
-            passwordConfirm: '',
-          })
-        } else {
-          toast.error('There was a problem updating your account.')
-        }
-      }
-    },
-    [user, setUser, reset],
-  )
-
   useEffect(() => {
-    if (user === null) {
-      router.push(
-        `/login?error=${encodeURIComponent(
-          'You must be logged in to view this page.',
-        )}&redirect=${encodeURIComponent('/account')}`,
-      )
-    }
-
-    // Once user is loaded, reset form to have default values
-    if (user) {
-      reset({
-        name: user.name,
-        email: user.email,
-        password: '',
-        passwordConfirm: '',
-      })
-    }
-  }, [user, router, reset, changePassword])
+    if (!user) return
+    reset({
+      avatarURL: user.avatarURL || '',
+      displayName: user.displayName || '',
+      firstName: user.firstName,
+      lastName: user.lastName || '',
+    })
+  }, [reset, user])
 
   return (
-    <form className="max-w-xl" onSubmit={handleSubmit(onSubmit)}>
-      {!changePassword ? (
-        <Fragment>
-          <div className="prose dark:prose-invert mb-8">
-            <p className="">
-              {'Change your account details below, or '}
-              <Button
-                className="px-0 text-inherit underline hover:cursor-pointer"
-                onClick={() => setChangePassword(!changePassword)}
-                type="button"
-                variant="link"
-              >
-                click here
-              </Button>
-              {' to change your password.'}
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-8 mb-8">
-            <FormItem>
-              <Label htmlFor="email" className="mb-2">
-                Email Address
-              </Label>
-              <Input
-                id="email"
-                {...register('email', { required: 'Please provide an email.' })}
-                type="email"
-              />
-              {errors.email && <FormError message={errors.email.message} />}
-            </FormItem>
-
-            <FormItem>
-              <Label htmlFor="name" className="mb-2">
-                Name
-              </Label>
-              <Input
-                id="name"
-                {...register('name', { required: 'Please provide a name.' })}
-                type="text"
-              />
-              {errors.name && <FormError message={errors.name.message} />}
-            </FormItem>
-          </div>
-        </Fragment>
-      ) : (
-        <Fragment>
-          <div className="prose dark:prose-invert mb-8">
-            <p>
-              {'Change your password below, or '}
-              <Button
-                className="px-0 text-inherit underline hover:cursor-pointer"
-                onClick={() => setChangePassword(!changePassword)}
-                type="button"
-                variant="link"
-              >
-                cancel
-              </Button>
-              .
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-8 mb-8">
-            <FormItem>
-              <Label htmlFor="password" className="mb-2">
-                New password
-              </Label>
-              <Input
-                id="password"
-                {...register('password', { required: 'Please provide a new password.' })}
-                type="password"
-              />
-              {errors.password && <FormError message={errors.password.message} />}
-            </FormItem>
-
-            <FormItem>
-              <Label htmlFor="passwordConfirm" className="mb-2">
-                Confirm password
-              </Label>
-              <Input
-                id="passwordConfirm"
-                {...register('passwordConfirm', {
-                  required: 'Please confirm your new password.',
-                  validate: (value) => value === password.current || 'The passwords do not match',
-                })}
-                type="password"
-              />
-              {errors.passwordConfirm && <FormError message={errors.passwordConfirm.message} />}
-            </FormItem>
-          </div>
-        </Fragment>
-      )}
-      <Button disabled={isLoading || isSubmitting || !isDirty} type="submit" variant="default">
-        {isLoading || isSubmitting
-          ? 'Processing'
-          : changePassword
-            ? 'Change Password'
-            : 'Update Account'}
+    <form
+      className="max-w-xl space-y-6"
+      onSubmit={handleSubmit(async (data) => {
+        setError('')
+        setMessage('')
+        const response = await fetch('/api/auth/profile', {
+          body: JSON.stringify(data),
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          method: 'PATCH',
+        })
+        const result = (await response.json().catch(() => ({}))) as {
+          message?: string
+          user?: SafeUser
+        }
+        if (!response.ok || !result.user) {
+          setError(result.message || 'Unable to update the profile.')
+          return
+        }
+        setUser(result.user)
+        reset({
+          avatarURL: result.user.avatarURL || '',
+          displayName: result.user.displayName || '',
+          firstName: result.user.firstName,
+          lastName: result.user.lastName || '',
+        })
+        setMessage('Profile updated.')
+      })}
+    >
+      {message && <p aria-live="polite" className="text-sm text-emerald-700">{message}</p>}
+      {error && <p aria-live="polite" className="text-sm text-red-700">{error}</p>}
+      <div className="grid gap-5 sm:grid-cols-2">
+        <FormItem>
+          <Label htmlFor="firstName">First name</Label>
+          <Input autoComplete="given-name" id="firstName" {...register('firstName', { required: 'First name is required.' })} />
+          {errors.firstName && <FormError message={errors.firstName.message} />}
+        </FormItem>
+        <FormItem>
+          <Label htmlFor="lastName">Last name</Label>
+          <Input autoComplete="family-name" id="lastName" {...register('lastName')} />
+        </FormItem>
+      </div>
+      <FormItem>
+        <Label htmlFor="displayName">Display name</Label>
+        <Input autoComplete="name" id="displayName" {...register('displayName')} />
+      </FormItem>
+      <FormItem>
+        <Label htmlFor="email">Email</Label>
+        <Input autoComplete="email" disabled id="email" readOnly type="email" value={user?.email || ''} />
+        <p className="text-xs text-alemah-taupe">Email changes require support-assisted verification.</p>
+      </FormItem>
+      <FormItem>
+        <Label htmlFor="avatarURL">Avatar image URL</Label>
+        <Input id="avatarURL" inputMode="url" placeholder="https://…" {...register('avatarURL')} />
+      </FormItem>
+      <Button disabled={!isDirty || isSubmitting} type="submit">
+        {isSubmitting ? 'Saving…' : 'Save profile'}
       </Button>
     </form>
   )

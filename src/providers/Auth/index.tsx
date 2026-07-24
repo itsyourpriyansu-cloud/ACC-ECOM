@@ -1,218 +1,122 @@
 'use client'
 
-import type { User } from '@/payload-types'
-
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 
-type ResetPassword = (args: {
-  password: string
-  passwordConfirm: string
-  token: string
-}) => Promise<void>
-
-type ForgotPassword = (args: { email: string }) => Promise<void>
-
-type Create = (args: { email: string; password: string; passwordConfirm: string }) => Promise<void>
-
-type Login = (args: { email: string; password: string }) => Promise<User>
-
-type Logout = () => Promise<void>
+import type { SafeUser } from '@/lib/auth/types'
 
 type AuthContext = {
-  create: Create
-  forgotPassword: ForgotPassword
-  login: Login
-  logout: Logout
-  resetPassword: ResetPassword
-  setUser: (user: User | null) => void
+  create: (args: {
+    acceptedTerms: boolean
+    email: string
+    firstName: string
+    lastName?: string
+    password: string
+    passwordConfirm: string
+  }) => Promise<{ redirectTo?: string }>
+  forgotPassword: (args: { email: string }) => Promise<void>
+  login: (args: { email: string; password: string; returnTo?: string }) => Promise<SafeUser>
+  logout: () => Promise<void>
+  resetPassword: (args: {
+    password: string
+    passwordConfirm: string
+    token: string
+  }) => Promise<void>
+  setUser: (user: SafeUser | null) => void
   status: 'loggedIn' | 'loggedOut' | undefined
-  user?: User | null
+  user?: null | SafeUser
+}
+
+type APIResponse = {
+  code?: string
+  fieldErrors?: Record<string, string[]>
+  message?: string
+  redirectTo?: string
+  success?: boolean
+  user?: null | SafeUser
 }
 
 const Context = createContext({} as AuthContext)
 
-type APIResponse = {
-  doc?: User
-  errors?: Array<{ message?: string }>
-  message?: string
-  user?: User | null
+const request = async (url: string, init?: RequestInit) => {
+  const response = await fetch(url, {
+    credentials: 'include',
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...init?.headers,
+    },
+  })
+  const result = (await response.json().catch(() => ({}))) as APIResponse
+  if (!response.ok || result.success === false) {
+    throw new Error(result.message || 'The request could not be completed.')
+  }
+  return result
 }
 
-const readAPIResponse = async (response: Response): Promise<APIResponse> => {
-  return (await response.json().catch(() => ({}))) as APIResponse
-}
+export const AuthProvider: React.FC<{
+  children: React.ReactNode
+  initialUser?: null | SafeUser
+}> = ({ children, initialUser }) => {
+  const [user, setUser] = useState<null | SafeUser | undefined>(initialUser)
+  const [status, setStatus] = useState<'loggedIn' | 'loggedOut' | undefined>(
+    initialUser ? 'loggedIn' : initialUser === null ? 'loggedOut' : undefined,
+  )
 
-const getAPIError = (response: Response, result: APIResponse, fallback: string) =>
-  new Error(result.errors?.[0]?.message || result.message || response.statusText || fallback)
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>()
-
-  // used to track the single event of logging in or logging out
-  // useful for `useEffect` hooks that should only run once
-  const [status, setStatus] = useState<'loggedIn' | 'loggedOut' | undefined>()
-  const create = useCallback<Create>(async (args) => {
-    try {
-      const res = await fetch('/api/users', {
-        body: JSON.stringify({
-          email: args.email,
-          password: args.password,
-          passwordConfirm: args.passwordConfirm,
-        }),
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-      })
-
-      const result = await readAPIResponse(res)
-      if (!res.ok || !result.doc) {
-        throw getAPIError(res, result, 'Unable to create the account.')
-      }
-
-      const loginResponse = await fetch('/api/users/login', {
-        body: JSON.stringify({ email: args.email, password: args.password }),
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        method: 'POST',
-      })
-      const loginResult = await readAPIResponse(loginResponse)
-      if (!loginResponse.ok || !loginResult.user) {
-        throw getAPIError(loginResponse, loginResult, 'The account was created, but sign-in failed.')
-      }
-
-      setUser(loginResult.user)
-      setStatus('loggedIn')
-    } catch (error) {
-      throw error instanceof Error ? error : new Error('Unable to create the account.')
-    }
+  const create = useCallback<AuthContext['create']>(async (args) => {
+    const result = await request('/api/auth/signup', {
+      body: JSON.stringify(args),
+      method: 'POST',
+    })
+    setUser(null)
+    setStatus('loggedOut')
+    return { redirectTo: result.redirectTo }
   }, [])
 
-  const login = useCallback<Login>(async (args) => {
-    try {
-      const res = await fetch('/api/users/login', {
-        body: JSON.stringify({
-          email: args.email,
-          password: args.password,
-        }),
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-      })
-
-      const result = await readAPIResponse(res)
-      if (res.ok && result.user) {
-        setUser(result.user)
-        setStatus('loggedIn')
-        return result.user
-      }
-
-      throw getAPIError(res, result, 'Invalid email or password.')
-    } catch (error) {
-      throw error instanceof Error ? error : new Error('Unable to sign in.')
-    }
+  const login = useCallback<AuthContext['login']>(async (args) => {
+    const result = await request('/api/auth/login', {
+      body: JSON.stringify(args),
+      method: 'POST',
+    })
+    if (!result.user) throw new Error('The session could not be established.')
+    setUser(result.user)
+    setStatus('loggedIn')
+    return result.user
   }, [])
 
-  const logout = useCallback<Logout>(async () => {
-    try {
-      const res = await fetch('/api/users/logout', {
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-      })
+  const logout = useCallback<AuthContext['logout']>(async () => {
+    await request('/api/auth/logout', { method: 'POST' })
+    setUser(null)
+    setStatus('loggedOut')
+  }, [])
 
-      if (res.ok) {
-        setUser(null)
-        setStatus('loggedOut')
-      } else {
-        throw new Error('Unable to sign out.')
-      }
-    } catch (error) {
-      throw error instanceof Error ? error : new Error('Unable to sign out.')
-    }
+  const forgotPassword = useCallback<AuthContext['forgotPassword']>(async (args) => {
+    await request('/api/auth/forgot-password', {
+      body: JSON.stringify(args),
+      method: 'POST',
+    })
+  }, [])
+
+  const resetPassword = useCallback<AuthContext['resetPassword']>(async (args) => {
+    await request('/api/auth/reset-password', {
+      body: JSON.stringify(args),
+      method: 'POST',
+    })
+    setUser(null)
+    setStatus('loggedOut')
   }, [])
 
   useEffect(() => {
-    const fetchMe = async () => {
-      try {
-        const res = await fetch('/api/users/me', {
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          method: 'GET',
-        })
-
-        if (res.ok) {
-          const { user: meUser } = await res.json()
-          setUser(meUser || null)
-          setStatus(meUser ? 'loggedIn' : 'loggedOut')
-        } else {
-          setUser(null)
-          setStatus('loggedOut')
-        }
-      } catch {
+    if (initialUser !== undefined) return
+    void request('/api/auth/session')
+      .then((result) => {
+        setUser(result.user || null)
+        setStatus(result.user ? 'loggedIn' : 'loggedOut')
+      })
+      .catch(() => {
         setUser(null)
         setStatus('loggedOut')
-      }
-    }
-
-    void fetchMe()
-  }, [])
-
-  const forgotPassword = useCallback<ForgotPassword>(async (args) => {
-    try {
-      const res = await fetch('/api/users/forgot-password', {
-        body: JSON.stringify({
-          email: args.email,
-        }),
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
       })
-
-      const result = await readAPIResponse(res)
-      if (!res.ok) {
-        throw getAPIError(res, result, 'Unable to request a password reset.')
-      }
-    } catch (error) {
-      throw error instanceof Error ? error : new Error('Unable to request a password reset.')
-    }
-  }, [])
-
-  const resetPassword = useCallback<ResetPassword>(async (args) => {
-    try {
-      const res = await fetch('/api/users/reset-password', {
-        body: JSON.stringify({
-          password: args.password,
-          passwordConfirm: args.passwordConfirm,
-          token: args.token,
-        }),
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        method: 'POST',
-      })
-
-      const result = await readAPIResponse(res)
-      if (!res.ok) {
-        throw getAPIError(res, result, 'Unable to reset the password.')
-      }
-
-      setUser(result.user || null)
-      setStatus(result.user ? 'loggedIn' : 'loggedOut')
-    } catch (error) {
-      throw error instanceof Error ? error : new Error('Unable to reset the password.')
-    }
-  }, [])
+  }, [initialUser])
 
   return (
     <Context.Provider
@@ -232,6 +136,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   )
 }
 
-type UseAuth = () => AuthContext
-
-export const useAuth: UseAuth = () => useContext(Context)
+export const useAuth = () => useContext(Context)

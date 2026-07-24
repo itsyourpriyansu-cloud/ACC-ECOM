@@ -27,6 +27,30 @@ export const AccountNav: React.FC<Props> = ({ className }) => {
             </Link>
           </Button>
         </li>
+        <li>
+          <Button asChild variant="link">
+            <Link
+              href="/account/profile"
+              className={clsx('text-primary/50 hover:text-primary hover:no-underline', {
+                'text-primary': pathname === '/account/profile',
+              })}
+            >
+              Profile
+            </Link>
+          </Button>
+        </li>
+        <li>
+          <Button asChild variant="link">
+            <Link
+              href="/account/security"
+              className={clsx('text-primary/50 hover:text-primary hover:no-underline', {
+                'text-primary': pathname === '/account/security',
+              })}
+            >
+              Security
+            </Link>
+          </Button>
+        </li>
 
         <li>
           <Button asChild variant="link">

@@ -25,8 +25,13 @@ import { Media } from '@/collections/Media'
 import { Pages } from '@/collections/Pages'
 import { Users } from '@/collections/Users'
 import { Wishlists } from '@/collections/Wishlists'
+import { AuthAuditEvents } from '@/collections/AuthAuditEvents'
+import { AuthIdentities } from '@/collections/AuthIdentities'
+import { AuthRateLimits } from '@/collections/AuthRateLimits'
+import { OAuthSessions } from '@/collections/OAuthSessions'
 import { Footer } from '@/globals/Footer'
 import { Header } from '@/globals/Header'
+import { getAppURL } from '@/lib/auth/config'
 import { plugins } from './plugins'
 
 const filename = fileURLToPath(import.meta.url)
@@ -80,6 +85,10 @@ if (isProduction && !isProductionBuild && googleAuthEnabled && (!process.env.GOO
   throw new Error('Google sign-in is enabled but GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is missing.')
 }
 
+if (isProduction && !isProductionBuild && !process.env.AUTH_SESSION_SECRET) {
+  throw new Error('AUTH_SESSION_SECRET must be configured in production.')
+}
+
 const db = usePostgres
   ? postgresAdapter({
       pool: {
@@ -102,7 +111,7 @@ const db = usePostgres
     })
   : sqliteAdapter({
       client: {
-        url: 'file:./local.db',
+        url: process.env.SQLITE_URL || 'file:./local.db',
       },
     })
 
@@ -142,7 +151,17 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Users, Wishlists, Pages, Categories, Media],
+  collections: [
+    Users,
+    AuthIdentities,
+    OAuthSessions,
+    AuthAuditEvents,
+    AuthRateLimits,
+    Wishlists,
+    Pages,
+    Categories,
+    Media,
+  ],
   db,
   email,
   editor: lexicalEditor({
@@ -192,6 +211,7 @@ export default buildConfig({
       token: vercelBlobToken,
     }),
   ],
+  serverURL: getAppURL(),
   secret: payloadSecret || 'development-only-payload-secret',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

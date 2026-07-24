@@ -6,6 +6,7 @@ import * as migration_20260712_061000_add_phonepe_shipping_snapshot from './2026
 import * as migration_20260712_062000_add_shiprocket_fulfillment_fields from './20260712_062000_add_shiprocket_fulfillment_fields';
 import * as migration_20260712_063000_add_customer_identity_and_wishlists from './20260712_063000_add_customer_identity_and_wishlists';
 import * as migration_20260712_064000_add_wishlist_lock_relation from './20260712_064000_add_wishlist_lock_relation';
+import * as migration_20260724_104500_add_production_auth_system from './20260724_104500_add_production_auth_system';
 
 export const migrations = [
   {
@@ -47,5 +48,10 @@ export const migrations = [
     up: migration_20260712_064000_add_wishlist_lock_relation.up,
     down: migration_20260712_064000_add_wishlist_lock_relation.down,
     name: '20260712_064000_add_wishlist_lock_relation'
+  },
+  {
+    up: migration_20260724_104500_add_production_auth_system.up,
+    down: migration_20260724_104500_add_production_auth_system.down,
+    name: '20260724_104500_add_production_auth_system'
   },
 ];

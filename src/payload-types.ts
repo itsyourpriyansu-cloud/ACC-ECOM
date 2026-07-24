@@ -73,6 +73,10 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    'auth-identities': AuthIdentity;
+    'oauth-sessions': OauthSession;
+    'auth-audit-events': AuthAuditEvent;
+    'auth-rate-limits': AuthRateLimit;
     wishlists: Wishlist;
     pages: Page;
     categories: Category;
@@ -108,6 +112,10 @@ export interface Config {
   };
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    'auth-identities': AuthIdentitiesSelect<false> | AuthIdentitiesSelect<true>;
+    'oauth-sessions': OauthSessionsSelect<false> | OauthSessionsSelect<true>;
+    'auth-audit-events': AuthAuditEventsSelect<false> | AuthAuditEventsSelect<true>;
+    'auth-rate-limits': AuthRateLimitsSelect<false> | AuthRateLimitsSelect<true>;
     wishlists: WishlistsSelect<false> | WishlistsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
@@ -190,13 +198,24 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   name?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  displayName?: string | null;
+  avatarURL?: string | null;
   /**
    * Stored in international format and verified before phone sign-in is enabled.
    */
   phoneNumber?: string | null;
   phoneVerifiedAt?: string | null;
   googleSubject?: string | null;
-  roles?: ('admin' | 'customer')[] | null;
+  roles?: ('admin' | 'customer' | 'support')[] | null;
+  accountStatus: 'active' | 'blocked' | 'pendingDeletion';
+  authMethods?: ('password' | 'google')[] | null;
+  hasLocalPassword?: boolean | null;
+  emailVerifiedAt?: string | null;
+  acceptedTermsAt?: string | null;
+  lastLoginAt?: string | null;
+  lastLoginProvider?: ('password' | 'google') | null;
   orders?: {
     docs?: (number | Order)[];
     hasNextPage?: boolean;
@@ -224,6 +243,8 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  _verified?: boolean | null;
+  _verificationToken?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -1118,6 +1139,93 @@ export interface Wishlist {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "auth-identities".
+ */
+export interface AuthIdentity {
+  id: number;
+  user: number | User;
+  provider: 'google';
+  providerAccountId: string;
+  providerKey: string;
+  providerEmail?: string | null;
+  linkedAt: string;
+  lastUsedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauth-sessions".
+ */
+export interface OauthSession {
+  id: number;
+  user: number | User;
+  tokenHash: string;
+  expiresAt: string;
+  revokedAt?: string | null;
+  createdUserAgentHash?: string | null;
+  createdIPHash?: string | null;
+  lastUsedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "auth-audit-events".
+ */
+export interface AuthAuditEvent {
+  id: number;
+  event:
+    | 'signup_succeeded'
+    | 'signup_failed'
+    | 'email_verification_succeeded'
+    | 'email_verification_failed'
+    | 'password_login_succeeded'
+    | 'password_login_failed'
+    | 'google_login_succeeded'
+    | 'google_login_failed'
+    | 'google_identity_linked'
+    | 'logout'
+    | 'logout_all_devices'
+    | 'password_reset_requested'
+    | 'password_reset_completed'
+    | 'account_blocked'
+    | 'identity_conflict'
+    | 'oauth_state_mismatch'
+    | 'oauth_callback_expired';
+  user?: (number | null) | User;
+  provider?: ('password' | 'google') | null;
+  success: boolean;
+  reasonCode?: string | null;
+  ipHash?: string | null;
+  userAgent?: string | null;
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "auth-rate-limits".
+ */
+export interface AuthRateLimit {
+  id: number;
+  bucketKey: string;
+  action: string;
+  count: number;
+  expiresAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
@@ -1160,6 +1268,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'auth-identities';
+        value: number | AuthIdentity;
+      } | null)
+    | ({
+        relationTo: 'oauth-sessions';
+        value: number | OauthSession;
+      } | null)
+    | ({
+        relationTo: 'auth-audit-events';
+        value: number | AuthAuditEvent;
+      } | null)
+    | ({
+        relationTo: 'auth-rate-limits';
+        value: number | AuthRateLimit;
       } | null)
     | ({
         relationTo: 'wishlists';
@@ -1265,10 +1389,21 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  firstName?: T;
+  lastName?: T;
+  displayName?: T;
+  avatarURL?: T;
   phoneNumber?: T;
   phoneVerifiedAt?: T;
   googleSubject?: T;
   roles?: T;
+  accountStatus?: T;
+  authMethods?: T;
+  hasLocalPassword?: T;
+  emailVerifiedAt?: T;
+  acceptedTermsAt?: T;
+  lastLoginAt?: T;
+  lastLoginProvider?: T;
   orders?: T;
   cart?: T;
   addresses?: T;
@@ -1280,6 +1415,8 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  _verified?: T;
+  _verificationToken?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
@@ -1289,6 +1426,64 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "auth-identities_select".
+ */
+export interface AuthIdentitiesSelect<T extends boolean = true> {
+  user?: T;
+  provider?: T;
+  providerAccountId?: T;
+  providerKey?: T;
+  providerEmail?: T;
+  linkedAt?: T;
+  lastUsedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "oauth-sessions_select".
+ */
+export interface OauthSessionsSelect<T extends boolean = true> {
+  user?: T;
+  tokenHash?: T;
+  expiresAt?: T;
+  revokedAt?: T;
+  createdUserAgentHash?: T;
+  createdIPHash?: T;
+  lastUsedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "auth-audit-events_select".
+ */
+export interface AuthAuditEventsSelect<T extends boolean = true> {
+  event?: T;
+  user?: T;
+  provider?: T;
+  success?: T;
+  reasonCode?: T;
+  ipHash?: T;
+  userAgent?: T;
+  metadata?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "auth-rate-limits_select".
+ */
+export interface AuthRateLimitsSelect<T extends boolean = true> {
+  bucketKey?: T;
+  action?: T;
+  count?: T;
+  expiresAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

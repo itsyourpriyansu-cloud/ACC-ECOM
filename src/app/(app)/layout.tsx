@@ -15,6 +15,7 @@ import CartDrawer from '@/components/Cart/CartDrawer'
 import MobileTabBar from '@/components/MobileTabBar'
 import { ToastContainer } from '@/components/ToastContainer'
 import { PWARegistration } from '@/components/PWARegistration'
+import { getCurrentUser } from '@/lib/auth/current-user'
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'),
@@ -33,6 +34,8 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
+  const current = await getCurrentUser()
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -42,7 +45,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <link href="/alemah-icon-180.png" rel="apple-touch-icon" sizes="180x180" />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <Providers>
+        <Providers initialUser={current?.safe || null}>
           <PWARegistration />
           <AdminBar />
           <LivePreviewListener />

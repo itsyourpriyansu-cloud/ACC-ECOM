@@ -1,211 +1,140 @@
 'use client'
 
-import { FormError } from '@/components/forms/FormError'
-import { FormItem } from '@/components/forms/FormItem'
-import { getSafeInternalPath } from '@/lib/auth/safe-redirect'
-import { Message } from '@/components/Message'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useAuth } from '@/providers/Auth'
-import { Chrome } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import React, { useCallback, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
+import { FormError } from '@/components/forms/FormError'
+import { FormItem } from '@/components/forms/FormItem'
+import { Message } from '@/components/Message'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { getSafeInternalPath } from '@/lib/auth/safe-redirect'
+import { useAuth } from '@/providers/Auth'
+
 type FormData = {
+  acceptedTerms: boolean
   email: string
-  name?: string
-  password?: string
-  passwordConfirm?: string
+  firstName: string
+  lastName: string
+  password: string
+  passwordConfirm: string
 }
 
-export const CreateAccountForm: React.FC = () => {
-  const searchParams = useSearchParams()
-  const allParams = searchParams.toString() ? `?${searchParams.toString()}` : ''
-  const { login } = useAuth()
+export const CreateAccountForm = () => {
+  const { create } = useAuth()
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
+  const searchParams = useSearchParams()
+  const returnTo = getSafeInternalPath(searchParams.get('returnTo'))
   const [error, setError] = useState<null | string>(null)
-  const [step, setStep] = useState<'email' | 'signup'>('email')
+  const [showPassword, setShowPassword] = useState(false)
   const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true'
-
   const {
-    formState: { errors },
+    formState: { errors, isSubmitting },
     handleSubmit,
     register,
+    setValue,
     watch,
-  } = useForm<FormData>()
-
+  } = useForm<FormData>({ defaultValues: { acceptedTerms: false } })
   const password = useRef('')
-  password.current = watch('password', '') || ''
+  password.current = watch('password', '')
 
-  const continueWithEmail = useCallback(
-    async ({ email }: FormData) => {
-      try {
-        setLoading(true)
-        setError(null)
-        const response = await fetch('/auth/email/continue', {
-          body: JSON.stringify({ email }),
-          headers: { 'Content-Type': 'application/json' },
-          method: 'POST',
-        })
-        const result = (await response.json()) as { message?: string; next?: 'login' | 'signup' }
-
-        if (!response.ok || !result.next) throw new Error(result.message || 'We could not check this email.')
-
-        if (result.next === 'login') {
-          const params = new URLSearchParams({
-            email,
-            notice: 'An Alemah account already exists for this email. Please sign in.',
-          })
-          const redirect = searchParams.get('redirect')
-          if (redirect) params.set('redirect', redirect)
-          router.push(`/login?${params.toString()}`)
-          return
-        }
-
-        setStep('signup')
-      } catch (caughtError) {
-        setError(caughtError instanceof Error ? caughtError.message : 'Please try again.')
-      } finally {
-        setLoading(false)
-      }
-    },
-    [router, searchParams],
-  )
-
-  const createAccount = useCallback(
+  const onSubmit = useCallback(
     async (data: FormData) => {
       try {
-        setLoading(true)
         setError(null)
-        if (!data.password || !data.passwordConfirm) throw new Error('Please choose and confirm a password.')
-
-        const response = await fetch('/api/users', {
-          body: JSON.stringify({
-            email: data.email,
-            name: data.name,
-            password: data.password,
-            passwordConfirm: data.passwordConfirm,
-          }),
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          method: 'POST',
-        })
-
-        if (!response.ok) {
-          throw new Error(response.statusText || 'There was an error creating the account.')
-        }
-
-        await login({ email: data.email, password: data.password })
-        const redirect = getSafeInternalPath(
-          searchParams.get('redirect'),
-          `/account?success=${encodeURIComponent('Account created successfully')}`,
-        )
-        router.push(redirect)
-      } catch (error) {
-        setError(error instanceof Error ? error.message : 'There was an error creating the account. Please try again.')
-      } finally {
-        setLoading(false)
+        const result = await create(data)
+        router.push(result.redirectTo || '/check-email')
+      } catch (caught) {
+        setError(caught instanceof Error ? caught.message : 'Unable to create the account.')
       }
     },
-    [login, router, searchParams],
+    [create, router],
   )
 
   return (
-    <form
-      className="max-w-lg py-4"
-      onSubmit={handleSubmit(step === 'email' ? continueWithEmail : createAccount)}
-    >
-      <div className="prose dark:prose-invert mb-6">
-        <p>{step === 'email'
-          ? 'Start with your email. We will take you to sign in if you already have an Alemah account.'
-          : 'Create your Alemah account to save addresses, view orders and make checkout faster.'}</p>
-      </div>
-
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       <Message error={error} />
-
-      <div className="flex flex-col gap-8 mb-8">
+      <div className="grid gap-5 sm:grid-cols-2">
         <FormItem>
-          <Label htmlFor="email" className="mb-2">
-            Email Address
-          </Label>
-          <Input
-            id="email"
-            {...register('email', { required: 'Email is required.' })}
-            readOnly={step === 'signup'}
-            type="email"
-          />
-          {errors.email && <FormError message={errors.email.message} />}
+          <Label htmlFor="firstName">First name</Label>
+          <Input autoComplete="given-name" id="firstName" {...register('firstName', { required: 'First name is required.' })} />
+          {errors.firstName && <FormError message={errors.firstName.message} />}
         </FormItem>
-
-        {step === 'signup' && (
-          <>
-            <FormItem>
-              <Label htmlFor="name" className="mb-2">Your name</Label>
-              <Input id="name" {...register('name', { required: 'Please provide your name.' })} type="text" />
-              {errors.name && <FormError message={errors.name.message} />}
-            </FormItem>
-            <FormItem>
-              <Label htmlFor="password" className="mb-2">New password</Label>
-              <Input id="password" {...register('password', { required: 'Password is required.' })} type="password" />
-              {errors.password && <FormError message={errors.password.message} />}
-            </FormItem>
-            <FormItem>
-              <Label htmlFor="passwordConfirm" className="mb-2">Confirm password</Label>
-              <Input
-                id="passwordConfirm"
-                {...register('passwordConfirm', {
-                  required: 'Please confirm your password.',
-                  validate: (value) => value === password.current || 'The passwords do not match',
-                })}
-                type="password"
-              />
-              {errors.passwordConfirm && <FormError message={errors.passwordConfirm.message} />}
-            </FormItem>
-          </>
-        )}
+        <FormItem>
+          <Label htmlFor="lastName">Last name <span className="text-primary/50">(optional)</span></Label>
+          <Input autoComplete="family-name" id="lastName" {...register('lastName')} />
+        </FormItem>
       </div>
-      <Button disabled={loading} type="submit" variant="default">
-        {loading ? 'Processing' : step === 'email' ? 'Continue with email' : 'Create account'}
+      <FormItem>
+        <Label htmlFor="email">Email</Label>
+        <Input autoComplete="email" id="email" type="email" {...register('email', { required: 'Email is required.' })} />
+        {errors.email && <FormError message={errors.email.message} />}
+      </FormItem>
+      <FormItem>
+        <Label htmlFor="password">Password</Label>
+        <div className="relative">
+          <Input
+            autoComplete="new-password"
+            className="pr-12"
+            id="password"
+            type={showPassword ? 'text' : 'password'}
+            {...register('password', { required: 'Password is required.', minLength: { value: 12, message: 'Use at least 12 characters.' } })}
+          />
+          <button aria-label={showPassword ? 'Hide passwords' : 'Show passwords'} className="absolute inset-y-0 right-0 grid w-11 place-items-center" onClick={() => setShowPassword((value) => !value)} type="button">
+            {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          </button>
+        </div>
+        {errors.password && <FormError message={errors.password.message} />}
+        <p className="text-xs text-primary/60">Use 12+ characters. Long passphrases are welcome.</p>
+      </FormItem>
+      <FormItem>
+        <Label htmlFor="passwordConfirm">Confirm password</Label>
+        <Input
+          autoComplete="new-password"
+          id="passwordConfirm"
+          type={showPassword ? 'text' : 'password'}
+          {...register('passwordConfirm', {
+            required: 'Confirm your password.',
+            validate: (value) => value === password.current || 'The passwords do not match.',
+          })}
+        />
+        {errors.passwordConfirm && <FormError message={errors.passwordConfirm.message} />}
+      </FormItem>
+      <div className="flex items-start gap-3">
+        <Checkbox
+          aria-describedby="terms-help"
+          id="acceptedTerms"
+          onCheckedChange={(checked) => setValue('acceptedTerms', checked === true, { shouldValidate: true })}
+        />
+        <Label className="font-normal leading-5" htmlFor="acceptedTerms">
+          I accept the <Link className="underline" href="/terms">terms</Link> and <Link className="underline" href="/privacy">privacy policy</Link>.
+        </Label>
+      </div>
+      <input
+        type="hidden"
+        {...register('acceptedTerms', { validate: (value) => value || 'You must accept the terms.' })}
+      />
+      {errors.acceptedTerms && <FormError message={errors.acceptedTerms.message} />}
+      <Button className="w-full" disabled={isSubmitting} size="lg" type="submit">
+        {isSubmitting ? 'Creating account…' : 'Create account'}
       </Button>
-
-      {step === 'signup' && (
-        <Button className="ml-3" onClick={() => setStep('email')} type="button" variant="ghost">
-          Use a different email
-        </Button>
-      )}
-
       {googleEnabled && (
         <>
-          <div className="my-7 flex items-center gap-3 text-xs uppercase tracking-[0.16em] text-primary/45">
-            <span className="h-px flex-1 bg-primary/10" />
-            Or
-            <span className="h-px flex-1 bg-primary/10" />
+          <div className="flex items-center gap-3 text-xs uppercase tracking-[0.16em] text-primary/45">
+            <span className="h-px flex-1 bg-primary/10" />Or<span className="h-px flex-1 bg-primary/10" />
           </div>
           <Button asChild className="w-full" size="lg" variant="outline">
-            <a
-              href={`/auth/google?returnTo=${encodeURIComponent(
-                getSafeInternalPath(searchParams.get('redirect')),
-              )}`}
-            >
-              <Chrome className="mr-2 size-4" />
-              Continue with Google
-            </a>
+            <a href={`/api/auth/google?returnTo=${encodeURIComponent(returnTo)}`}>Continue with Google</a>
           </Button>
+          <p className="text-xs text-primary/60">Continuing with Google means you accept the terms and privacy policy.</p>
         </>
       )}
-
-      <div className="prose dark:prose-invert mt-8">
-        <p>
-          {'Already have an account? '}
-          <Link href={`/login${allParams}`}>Login</Link>
-        </p>
-      </div>
+      <p className="text-center text-sm">Already have an account? <Link className="underline" href="/login">Sign in</Link></p>
     </form>
   )
 }

@@ -5,6 +5,7 @@ import { useAuth } from '@/providers/Auth'
 import { EcommerceProvider, useEcommerce } from '@payloadcms/plugin-ecommerce/client/react'
 import { phonePeAdapterClient } from '@/payments/phonepe'
 import React, { useEffect } from 'react'
+import type { SafeUser } from '@/lib/auth/types'
 
 import { HeaderThemeProvider } from './HeaderTheme'
 import { ThemeProvider } from './Theme'
@@ -21,7 +22,10 @@ const EcommerceAuthSync: React.FC = () => {
 
   useEffect(() => {
     if (status === 'loggedIn') {
-      void onLogin()
+      // Commerce hydration can still be in flight when the customer logs out.
+      // Treat that expected 401/403 race as a stale refresh, not an unhandled
+      // browser rejection; the next authenticated transition hydrates again.
+      void onLogin().catch(() => undefined)
     }
   }, [onLogin, status])
 
@@ -30,10 +34,11 @@ const EcommerceAuthSync: React.FC = () => {
 
 export const Providers: React.FC<{
   children: React.ReactNode
-}> = ({ children }) => {
+  initialUser?: null | SafeUser
+}> = ({ children, initialUser }) => {
   return (
     <ThemeProvider>
-      <AuthProvider>
+      <AuthProvider initialUser={initialUser}>
         <HeaderThemeProvider>
           <SonnerProvider />
           <EcommerceProvider

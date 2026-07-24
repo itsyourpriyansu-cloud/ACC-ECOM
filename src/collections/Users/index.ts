@@ -2,21 +2,32 @@ import type { CollectionConfig } from 'payload'
 
 import { adminOnly } from '@/access/adminOnly'
 import { adminOnlyFieldAccess } from '@/access/adminOnlyFieldAccess'
-import { publicAccess } from '@/access/publicAccess'
 import { adminOrSelf } from '@/access/adminOrSelf'
 import { checkRole } from '@/access/utilities'
 
 import { ensureFirstUserIsAdmin } from './hooks/ensureFirstUserIsAdmin'
+import {
+  enforceSafeUserMutation,
+  recordAccountBlock,
+  recordPasswordLogin,
+  rejectBlockedLogin,
+  rejectBlockedSession,
+} from './hooks/security'
+import { oauthSessionStrategy } from '@/lib/auth/strategy'
+import { getAppURL } from '@/lib/auth/config'
 
 export const Users: CollectionConfig = {
   slug: 'users',
   access: {
     admin: ({ req: { user } }) => checkRole(['admin'], user),
-    create: publicAccess,
+    create: adminOnly,
     delete: adminOnly,
     read: adminOrSelf,
     unlock: adminOnly,
-    update: adminOrSelf,
+    // Customer profile changes go through the schema-validated profile route.
+    // Keeping generic document updates admin-only closes every mass-assignment
+    // path, including fields added to this collection in the future.
+    update: adminOnly,
   },
   admin: {
     group: 'Users',
@@ -24,12 +35,64 @@ export const Users: CollectionConfig = {
     useAsTitle: 'name',
   },
   auth: {
-    tokenExpiration: 1209600,
+    cookies: {
+      domain: process.env.AUTH_COOKIE_DOMAIN || undefined,
+      sameSite: 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+    },
+    forgotPassword: {
+      expiration: 60 * 60 * 1000,
+      generateEmailHTML: (args) => {
+        const url = `${getAppURL()}/reset-password?token=${encodeURIComponent(args?.token || '')}`
+        return `<p>Use the link below to reset your Alemah password. This link expires in one hour.</p><p><a href="${url}">Reset password</a></p><p>If you did not request this, you can ignore this email.</p>`
+      },
+      generateEmailSubject: () => 'Reset your Alemah password',
+    },
+    lockTime: 15 * 60 * 1000,
+    maxLoginAttempts: 5,
+    removeTokenFromResponses: true,
+    strategies: [oauthSessionStrategy],
+    tokenExpiration: 60 * 60 * 24 * 7,
+    useSessions: true,
+    verify: {
+      generateEmailHTML: ({ token }) => {
+        const url = `${getAppURL()}/verify-email?token=${encodeURIComponent(token)}`
+        return `<p>Confirm your email address to finish creating your Alemah account.</p><p><a href="${url}">Verify email</a></p><p>If you did not create this account, you can ignore this email.</p>`
+      },
+      generateEmailSubject: () => 'Verify your Alemah email address',
+    },
+  },
+  hooks: {
+    afterChange: [recordAccountBlock],
+    afterLogin: [recordPasswordLogin],
+    afterRead: [rejectBlockedSession],
+    beforeChange: [enforceSafeUserMutation],
+    beforeLogin: [rejectBlockedLogin],
   },
   fields: [
     {
       name: 'name',
       type: 'text',
+    },
+    {
+      name: 'firstName',
+      type: 'text',
+      maxLength: 80,
+    },
+    {
+      name: 'lastName',
+      type: 'text',
+      maxLength: 80,
+    },
+    {
+      name: 'displayName',
+      type: 'text',
+      maxLength: 120,
+    },
+    {
+      name: 'avatarURL',
+      type: 'text',
+      maxLength: 2048,
     },
     {
       name: 'phoneNumber',
@@ -82,6 +145,92 @@ export const Users: CollectionConfig = {
           label: 'customer',
           value: 'customer',
         },
+        {
+          label: 'support',
+          value: 'support',
+        },
+      ],
+      saveToJWT: true,
+    },
+    {
+      name: 'accountStatus',
+      type: 'select',
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+      defaultValue: 'active',
+      options: [
+        { label: 'Active', value: 'active' },
+        { label: 'Blocked', value: 'blocked' },
+        { label: 'Pending deletion', value: 'pendingDeletion' },
+      ],
+      required: true,
+      saveToJWT: true,
+    },
+    {
+      name: 'authMethods',
+      type: 'select',
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+      hasMany: true,
+      options: [
+        { label: 'Password', value: 'password' },
+        { label: 'Google', value: 'google' },
+      ],
+    },
+    {
+      name: 'hasLocalPassword',
+      type: 'checkbox',
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+      defaultValue: false,
+    },
+    {
+      name: 'emailVerifiedAt',
+      type: 'date',
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
+      name: 'acceptedTermsAt',
+      type: 'date',
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
+      name: 'lastLoginAt',
+      type: 'date',
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+    },
+    {
+      name: 'lastLoginProvider',
+      type: 'select',
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
+      options: [
+        { label: 'Password', value: 'password' },
+        { label: 'Google', value: 'google' },
       ],
     },
     {
