@@ -1,14 +1,10 @@
 import crypto from 'crypto'
 
+import { getSafeInternalPath } from '@/lib/auth/safe-redirect'
 import { NextRequest, NextResponse } from 'next/server'
 
 const STATE_COOKIE = 'alemah-google-oauth-state'
 const STATE_LIFETIME_SECONDS = 10 * 60
-
-const getReturnTo = (value: string | null) => {
-  if (!value || !value.startsWith('/') || value.startsWith('//')) return '/account'
-  return value
-}
 
 export async function GET(request: NextRequest) {
   const clientID = process.env.GOOGLE_CLIENT_ID
@@ -23,7 +19,7 @@ export async function GET(request: NextRequest) {
 
   const state = crypto.randomBytes(32).toString('base64url')
   const redirectURI = new URL('/auth/google/callback', request.url).toString()
-  const returnTo = getReturnTo(request.nextUrl.searchParams.get('returnTo'))
+  const returnTo = getSafeInternalPath(request.nextUrl.searchParams.get('returnTo'))
   const authorizationURL = new URL('https://accounts.google.com/o/oauth2/v2/auth')
 
   authorizationURL.searchParams.set('client_id', clientID)

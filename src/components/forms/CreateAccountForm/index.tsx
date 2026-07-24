@@ -2,6 +2,7 @@
 
 import { FormError } from '@/components/forms/FormError'
 import { FormItem } from '@/components/forms/FormItem'
+import { getSafeInternalPath } from '@/lib/auth/safe-redirect'
 import { Message } from '@/components/Message'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -101,9 +102,11 @@ export const CreateAccountForm: React.FC = () => {
         }
 
         await login({ email: data.email, password: data.password })
-        const redirect = searchParams.get('redirect')
-        if (redirect) router.push(redirect)
-        else router.push(`/account?success=${encodeURIComponent('Account created successfully')}`)
+        const redirect = getSafeInternalPath(
+          searchParams.get('redirect'),
+          `/account?success=${encodeURIComponent('Account created successfully')}`,
+        )
+        router.push(redirect)
       } catch (error) {
         setError(error instanceof Error ? error.message : 'There was an error creating the account. Please try again.')
       } finally {
@@ -185,7 +188,11 @@ export const CreateAccountForm: React.FC = () => {
             <span className="h-px flex-1 bg-primary/10" />
           </div>
           <Button asChild className="w-full" size="lg" variant="outline">
-            <a href={`/auth/google?returnTo=${encodeURIComponent(searchParams.get('redirect') || '/account')}`}>
+            <a
+              href={`/auth/google?returnTo=${encodeURIComponent(
+                getSafeInternalPath(searchParams.get('redirect')),
+              )}`}
+            >
               <Chrome className="mr-2 size-4" />
               Continue with Google
             </a>

@@ -42,12 +42,22 @@ export const Users: CollectionConfig = {
     {
       name: 'phoneVerifiedAt',
       type: 'date',
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
       admin: { readOnly: true },
     },
     {
       name: 'googleSubject',
       type: 'text',
       unique: true,
+      access: {
+        create: adminOnlyFieldAccess,
+        read: adminOnlyFieldAccess,
+        update: adminOnlyFieldAccess,
+      },
       admin: { readOnly: true },
     },
     {

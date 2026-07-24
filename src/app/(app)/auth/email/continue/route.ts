@@ -39,8 +39,12 @@ export async function POST(request: NextRequest) {
   const payload = await getPayload({ config: configPromise })
   const result = await payload.find({
     collection: 'users',
+    depth: 0,
+    joins: false,
     limit: 1,
     overrideAccess: true,
+    pagination: false,
+    select: {},
     where: { email: { equals: email } },
   })
 

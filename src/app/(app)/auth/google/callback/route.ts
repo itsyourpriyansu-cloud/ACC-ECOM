@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 
+import { getSafeInternalPath } from '@/lib/auth/safe-redirect'
 import configPromise from '@payload-config'
 import { NextRequest, NextResponse } from 'next/server'
 import { createLocalReq, generatePayloadCookie, getFieldsToSign, getPayload, jwtSign } from 'payload'
@@ -14,8 +15,23 @@ type GoogleProfile = {
   sub?: string
 }
 
+const clearStateCookie = (response: NextResponse) => {
+  response.cookies.set({
+    name: STATE_COOKIE,
+    value: '',
+    expires: new Date(0),
+    httpOnly: true,
+    path: '/',
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+  })
+  return response
+}
+
 const loginError = (request: NextRequest, message: string) =>
-  NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(message)}`, request.url))
+  clearStateCookie(
+    NextResponse.redirect(new URL(`/login?error=${encodeURIComponent(message)}`, request.url)),
+  )
 
 const getStoredState = (value?: string) => {
   if (!value) return null
@@ -23,8 +39,8 @@ const getStoredState = (value?: string) => {
   try {
     const parsed = JSON.parse(value) as { returnTo?: unknown; state?: unknown }
     if (typeof parsed.state !== 'string' || typeof parsed.returnTo !== 'string') return null
-    if (!parsed.returnTo.startsWith('/') || parsed.returnTo.startsWith('//')) return null
-    return parsed as { returnTo: string; state: string }
+    const returnTo = getSafeInternalPath(parsed.returnTo)
+    return { returnTo, state: parsed.state }
   } catch {
     return null
   }
@@ -79,8 +95,11 @@ export async function GET(request: NextRequest) {
     const email = profile.email.toLowerCase().trim()
     const users = await payload.find({
       collection: 'users',
+      depth: 0,
+      joins: false,
       limit: 1,
       overrideAccess: true,
+      pagination: false,
       where: { googleSubject: { equals: profile.sub } },
     })
 
@@ -88,8 +107,11 @@ export async function GET(request: NextRequest) {
     if (!user) {
       const matchingEmail = await payload.find({
         collection: 'users',
+        depth: 0,
+        joins: false,
         limit: 1,
         overrideAccess: true,
+        pagination: false,
         where: { email: { equals: email } },
       })
 
@@ -141,7 +163,9 @@ export async function GET(request: NextRequest) {
       secret: payload.secret,
       tokenExpiration: collection.auth.tokenExpiration,
     })
-    const response = NextResponse.redirect(new URL(storedState.returnTo, request.url))
+    const response = NextResponse.redirect(
+      new URL(getSafeInternalPath(storedState.returnTo), request.url),
+    )
     response.headers.append(
       'Set-Cookie',
       generatePayloadCookie({
@@ -150,19 +174,25 @@ export async function GET(request: NextRequest) {
         token,
       }),
     )
-    response.cookies.set({
-      name: STATE_COOKIE,
-      value: '',
-      expires: new Date(0),
-      httpOnly: true,
-      path: '/',
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-    })
-    return response
+    return clearStateCookie(response)
   } catch (error) {
-    request.headers.get('x-request-id')
-    console.error('Google authentication failed.', error)
-    return loginError(request, 'We could not complete Google sign-in. Please try again.')
+    const cause = error instanceof Error && error.cause instanceof Error ? error.cause : undefined
+    const message = error instanceof Error ? error.message : 'Unknown authentication error'
+    const causeMessage = cause?.message
+    const isConnectionFailure = [message, causeMessage]
+      .filter(Boolean)
+      .some((value) => /connect|connection|timeout|ECONN|ENET|database/i.test(value || ''))
+
+    console.error('Google authentication failed.', {
+      cause: causeMessage,
+      message,
+      requestID: request.headers.get('x-vercel-id') || request.headers.get('x-request-id'),
+    })
+    return loginError(
+      request,
+      isConnectionFailure
+        ? 'Account sign-in is temporarily unavailable. Please try again in a moment.'
+        : 'We could not complete Google sign-in. Please try again.',
+    )
   }
 }

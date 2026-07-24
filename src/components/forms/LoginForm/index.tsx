@@ -2,6 +2,7 @@
 
 import { FormError } from '@/components/forms/FormError'
 import { FormItem } from '@/components/forms/FormItem'
+import { getSafeInternalPath } from '@/lib/auth/safe-redirect'
 import { Message } from '@/components/Message'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,7 +11,7 @@ import { useAuth } from '@/providers/Auth'
 import { Chrome } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 
 type FormData = {
@@ -21,7 +22,7 @@ type FormData = {
 export const LoginForm: React.FC = () => {
   const searchParams = useSearchParams()
   const allParams = searchParams.toString() ? `?${searchParams.toString()}` : ''
-  const redirect = useRef(searchParams.get('redirect'))
+  const redirect = getSafeInternalPath(searchParams.get('redirect'))
   const { login } = useAuth()
   const router = useRouter()
   const [error, setError] = React.useState<null | string>(null)
@@ -37,13 +38,12 @@ export const LoginForm: React.FC = () => {
     async (data: FormData) => {
       try {
         await login(data)
-        if (redirect?.current) router.push(redirect.current)
-        else router.push('/account')
+        router.push(redirect)
       } catch (_) {
         setError('There was an error with the credentials provided. Please try again.')
       }
     },
-    [login, router],
+    [login, redirect, router],
   )
 
   return (
@@ -97,7 +97,7 @@ export const LoginForm: React.FC = () => {
             <span className="h-px flex-1 bg-primary/10" />
           </div>
           <Button asChild className="w-full" size="lg" type="button" variant="outline">
-            <a href={`/auth/google?returnTo=${encodeURIComponent(redirect.current || '/account')}`}>
+            <a href={`/auth/google?returnTo=${encodeURIComponent(redirect)}`}>
               <Chrome className="mr-2 size-4" />
               Continue with Google
             </a>

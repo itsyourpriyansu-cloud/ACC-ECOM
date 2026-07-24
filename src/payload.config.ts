@@ -83,12 +83,15 @@ if (isProduction && !isProductionBuild && googleAuthEnabled && (!process.env.GOO
 const db = usePostgres
   ? postgresAdapter({
       pool: {
+        allowExitOnIdle: true,
+        application_name: process.env.VERCEL ? 'alemah-vercel' : 'alemah-local',
         connectionString: databaseURL!,
         // A Vercel function must fail promptly when its database network path is
         // unavailable. Without this, node-postgres can wait until the function
         // itself reaches Vercel's multi-minute runtime limit.
         connectionTimeoutMillis: Number(process.env.DATABASE_CONNECTION_TIMEOUT_MS || 10_000),
-        idleTimeoutMillis: 30_000,
+        idleTimeoutMillis: 10_000,
+        keepAlive: true,
         // Payload holds one connection for adapter initialization, so one
         // additional connection is required for application queries.
         max: Math.max(2, Number(process.env.DATABASE_POOL_MAX || 2)),

@@ -332,7 +332,7 @@ To run Payload in production, you need to build and start the Admin panel. To do
 This application uses Payload for users and authentication, with PostgreSQL as
 its database. It does **not** use the Supabase JavaScript Auth client. Supabase
 is supported as the managed PostgreSQL host: configure Payload's
-`DATABASE_URL` with Supabase's **Session Pooler** connection string.
+`DATABASE_URL` with Supabase's **Transaction Pooler** connection string.
 
 Before the first production deployment, copy the variable names from
 [`.env.production.example`](.env.production.example) into **Vercel → Project
@@ -341,7 +341,8 @@ minimum, set `PAYLOAD_SECRET`, `DATABASE_URL`,
 `PAYLOAD_PUBLIC_SERVER_URL=https://acc-ecom.vercel.app`, and
 `NEXT_PUBLIC_SERVER_URL=https://acc-ecom.vercel.app`. Use the exact Supabase
 pooler URI from **Supabase → Connect**; Vercel functions should use the
-Session Pooler (port `5432`) and `DATABASE_POOL_MAX=2`.
+Transaction Pooler (port `6543`) and `DATABASE_POOL_MAX=2`. A session-pooler
+connection can be exhausted when several Vercel instances start together.
 
 Apply committed Payload migrations deliberately with `npm run migrate` from a
 trusted environment before deploying. Set `SKIP_BUILD_MIGRATIONS=true` on

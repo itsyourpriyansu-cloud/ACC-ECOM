@@ -31,6 +31,20 @@ type AuthContext = {
 
 const Context = createContext({} as AuthContext)
 
+type APIResponse = {
+  doc?: User
+  errors?: Array<{ message?: string }>
+  message?: string
+  user?: User | null
+}
+
+const readAPIResponse = async (response: Response): Promise<APIResponse> => {
+  return (await response.json().catch(() => ({}))) as APIResponse
+}
+
+const getAPIError = (response: Response, result: APIResponse, fallback: string) =>
+  new Error(result.errors?.[0]?.message || result.message || response.statusText || fallback)
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>()
 
@@ -39,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [status, setStatus] = useState<'loggedIn' | 'loggedOut' | undefined>()
   const create = useCallback<Create>(async (args) => {
     try {
-      const res = await fetch('/api/users/create', {
+      const res = await fetch('/api/users', {
         body: JSON.stringify({
           email: args.email,
           password: args.password,
@@ -52,16 +66,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         method: 'POST',
       })
 
-      if (res.ok) {
-        const { data, errors } = await res.json()
-        if (errors) throw new Error(errors[0].message)
-        setUser(data?.loginUser?.user)
-        setStatus('loggedIn')
-      } else {
-        throw new Error('Invalid login')
+      const result = await readAPIResponse(res)
+      if (!res.ok || !result.doc) {
+        throw getAPIError(res, result, 'Unable to create the account.')
       }
-    } catch (e) {
-      throw new Error('An error occurred while attempting to login.')
+
+      const loginResponse = await fetch('/api/users/login', {
+        body: JSON.stringify({ email: args.email, password: args.password }),
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+      const loginResult = await readAPIResponse(loginResponse)
+      if (!loginResponse.ok || !loginResult.user) {
+        throw getAPIError(loginResponse, loginResult, 'The account was created, but sign-in failed.')
+      }
+
+      setUser(loginResult.user)
+      setStatus('loggedIn')
+    } catch (error) {
+      throw error instanceof Error ? error : new Error('Unable to create the account.')
     }
   }, [])
 
@@ -79,17 +103,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         method: 'POST',
       })
 
-      if (res.ok) {
-        const { errors, user } = await res.json()
-        if (errors) throw new Error(errors[0].message)
-        setUser(user)
+      const result = await readAPIResponse(res)
+      if (res.ok && result.user) {
+        setUser(result.user)
         setStatus('loggedIn')
-        return user
+        return result.user
       }
 
-      throw new Error('Invalid login')
-    } catch (e) {
-      throw new Error('An error occurred while attempting to login.')
+      throw getAPIError(res, result, 'Invalid email or password.')
+    } catch (error) {
+      throw error instanceof Error ? error : new Error('Unable to sign in.')
     }
   }, [])
 
@@ -107,10 +130,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(null)
         setStatus('loggedOut')
       } else {
-        throw new Error('An error occurred while attempting to logout.')
+        throw new Error('Unable to sign out.')
       }
-    } catch (e) {
-      throw new Error('An error occurred while attempting to logout.')
+    } catch (error) {
+      throw error instanceof Error ? error : new Error('Unable to sign out.')
     }
   }, [])
 
@@ -128,13 +151,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (res.ok) {
           const { user: meUser } = await res.json()
           setUser(meUser || null)
-          setStatus(meUser ? 'loggedIn' : undefined)
+          setStatus(meUser ? 'loggedIn' : 'loggedOut')
         } else {
-          throw new Error('An error occurred while fetching your account.')
+          setUser(null)
+          setStatus('loggedOut')
         }
-      } catch (e) {
+      } catch {
         setUser(null)
-        throw new Error('An error occurred while fetching your account.')
+        setStatus('loggedOut')
       }
     }
 
@@ -154,15 +178,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         method: 'POST',
       })
 
-      if (res.ok) {
-        const { data, errors } = await res.json()
-        if (errors) throw new Error(errors[0].message)
-        setUser(data?.loginUser?.user)
-      } else {
-        throw new Error('Invalid login')
+      const result = await readAPIResponse(res)
+      if (!res.ok) {
+        throw getAPIError(res, result, 'Unable to request a password reset.')
       }
-    } catch (e) {
-      throw new Error('An error occurred while attempting to login.')
+    } catch (error) {
+      throw error instanceof Error ? error : new Error('Unable to request a password reset.')
     }
   }, [])
 
@@ -181,16 +202,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         method: 'POST',
       })
 
-      if (res.ok) {
-        const { data, errors } = await res.json()
-        if (errors) throw new Error(errors[0].message)
-        setUser(data?.loginUser?.user)
-        setStatus(data?.loginUser?.user ? 'loggedIn' : undefined)
-      } else {
-        throw new Error('Invalid login')
+      const result = await readAPIResponse(res)
+      if (!res.ok) {
+        throw getAPIError(res, result, 'Unable to reset the password.')
       }
-    } catch (e) {
-      throw new Error('An error occurred while attempting to login.')
+
+      setUser(result.user || null)
+      setStatus(result.user ? 'loggedIn' : 'loggedOut')
+    } catch (error) {
+      throw error instanceof Error ? error : new Error('Unable to reset the password.')
     }
   }, [])
 
